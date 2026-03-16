@@ -22,7 +22,7 @@ export const mockAdminUser = {
   lastName: "",
   usdtBalance: 0,
   referralCode: "ADMIN001",
-  registrationStatus: "active" as const,
+  registrationStatus: "active" as string,
   isAdmin: true,
   walletAddress: "",
   createdAt: "2024-01-01",
