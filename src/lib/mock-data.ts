@@ -8,7 +8,7 @@ export const mockUser = {
   lastName: "Doe",
   usdtBalance: 45.50,
   referralCode: "JOHN2024",
-  registrationStatus: "active" as const,
+  registrationStatus: "active" as string,
   isAdmin: false,
   walletAddress: "TXkR...8fG2",
   createdAt: "2024-01-15",
