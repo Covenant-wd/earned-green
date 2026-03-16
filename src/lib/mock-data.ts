@@ -107,7 +107,7 @@ export const mockPendingUsers = [
   { id: "6", username: "bob", email: "bob@gmail.com", firstName: "Bob", lastName: "Jones", registrationStatus: "pending" as const, paymentProofUrl: "https://placehold.co/400x300", createdAt: "2024-03-14" },
 ];
 
-export const mockTaskCompletions = [
-  { id: "1", userId: "1", taskId: "1", status: "approved" as const, proofUrl: "https://twitter.com/proof1", submittedAt: "2024-03-10", reviewedAt: "2024-03-10" },
-  { id: "2", userId: "1", taskId: "3", status: "pending" as const, proofUrl: "https://t.me/proof2", submittedAt: "2024-03-11", reviewedAt: null },
+export const mockTaskCompletions: Array<{ id: string; userId: string; taskId: string; status: string; proofUrl: string; submittedAt: string; reviewedAt: string | null }> = [
+  { id: "1", userId: "1", taskId: "1", status: "approved", proofUrl: "https://twitter.com/proof1", submittedAt: "2024-03-10", reviewedAt: "2024-03-10" },
+  { id: "2", userId: "1", taskId: "3", status: "pending", proofUrl: "https://t.me/proof2", submittedAt: "2024-03-11", reviewedAt: null },
 ];
