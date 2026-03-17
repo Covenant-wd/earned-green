@@ -19,17 +19,14 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const success = await login(email, password);
-      if (success) {
-        toast.success("Welcome back!");
-        navigate("/dashboard");
-      }
-    } catch {
-      toast.error("Login failed");
-    } finally {
-      setLoading(false);
+    const result = await login(email, password);
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success("Welcome back!");
+      navigate("/dashboard");
     }
+    setLoading(false);
   };
 
   return (
@@ -53,41 +50,19 @@ export default function LoginPage() {
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 bg-secondary border-border"
-                required
-              />
+              <Input id="email" type="email" placeholder="you@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 bg-secondary border-border" required />
             </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 bg-secondary border-border"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
+              <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-10 bg-secondary border-border" required />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
-
           <Button type="submit" className="w-full gradient-primary text-primary-foreground font-semibold" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
@@ -95,14 +70,10 @@ export default function LoginPage() {
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Link to="/register" className="text-primary hover:underline">
-            Register
-          </Link>
+          <Link to="/register" className="text-primary hover:underline">Register</Link>
         </div>
         <div className="mt-2 text-center">
-          <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">
-            Forgot password?
-          </Link>
+          <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">Forgot password?</Link>
         </div>
       </motion.div>
     </div>

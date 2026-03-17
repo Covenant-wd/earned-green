@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Check, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,30 +7,56 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { mockTransactions } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function AdminTransactionsPage() {
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [txHashDialog, setTxHashDialog] = useState<string | null>(null);
   const [txHash, setTxHash] = useState("");
 
-  const filtered = (status: string) =>
-    mockTransactions.filter((t) => {
-      if (status === "withdrawal") return t.type === "withdrawal";
-      return t.status === status;
+  const load = async () => {
+    const { data } = await supabase.from("transactions").select("*, profiles:user_id(first_name, last_name, email)").order("created_at", { ascending: false });
+    setTransactions(data || []);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const filtered = (tab: string) =>
+    transactions.filter((t) => {
+      if (tab === "withdrawal") return t.type === "withdrawal";
+      return t.status === tab;
     });
+
+  const handleApprove = async (id: string, userId: string, amount: number) => {
+    const { error } = await supabase.from("transactions").update({ status: "completed", tx_hash: txHash || null }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    // Deduct balance for withdrawal
+    const { data: profile } = await supabase.from("profiles").select("usdt_balance").eq("user_id", userId).single();
+    if (profile) {
+      await supabase.from("profiles").update({ usdt_balance: Math.max(0, Number(profile.usdt_balance) - amount) }).eq("user_id", userId);
+    }
+    toast.success("Transaction approved");
+    setTxHashDialog(null);
+    setTxHash("");
+    load();
+  };
+
+  const handleReject = async (id: string) => {
+    await supabase.from("transactions").update({ status: "rejected" }).eq("id", id);
+    toast.error("Transaction rejected");
+    load();
+  };
 
   return (
     <div className="page-container">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <h1 className="page-title mb-6">Transactions</h1>
-
         <div className="relative mb-6 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="pl-10 bg-secondary border-border" />
         </div>
-
         <Tabs defaultValue="pending">
           <TabsList className="glass-card mb-6">
             <TabsTrigger value="pending">Pending</TabsTrigger>
@@ -38,7 +64,6 @@ export default function AdminTransactionsPage() {
             <TabsTrigger value="rejected">Rejected</TabsTrigger>
             <TabsTrigger value="withdrawal">Withdrawals</TabsTrigger>
           </TabsList>
-
           {["pending", "completed", "rejected", "withdrawal"].map((tab) => (
             <TabsContent key={tab} value={tab}>
               <div className="space-y-3">
@@ -47,31 +72,27 @@ export default function AdminTransactionsPage() {
                     <div>
                       <p className="font-medium capitalize">{tx.type.replace("_", " ")}</p>
                       <p className="text-xs text-muted-foreground">
-                        User: {tx.userId} • {new Date(tx.createdAt).toLocaleDateString()}
+                        {tx.profiles?.first_name} {tx.profiles?.last_name} • {new Date(tx.created_at).toLocaleDateString()}
                       </p>
-                      {tx.txHash && <p className="text-xs font-mono text-muted-foreground">TX: {tx.txHash}</p>}
+                      {tx.tx_hash && <p className="text-xs font-mono text-muted-foreground">TX: {tx.tx_hash}</p>}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono-amount">${tx.amount.toFixed(2)}</span>
+                      <span className="font-mono-amount">${Number(tx.amount).toFixed(2)}</span>
                       {tx.status === "pending" && tx.type === "withdrawal" && (
                         <>
                           <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => setTxHashDialog(tx.id)}>
                             <Check className="h-3 w-3 mr-1" /> Approve
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={() => toast.error("Withdrawal rejected")}>
+                          <Button size="sm" variant="destructive" onClick={() => handleReject(tx.id)}>
                             <X className="h-3 w-3 mr-1" /> Reject
                           </Button>
                         </>
                       )}
-                      <Badge variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"}>
-                        {tx.status}
-                      </Badge>
+                      <Badge variant={tx.status === "completed" ? "default" : tx.status === "pending" ? "secondary" : "destructive"}>{tx.status}</Badge>
                     </div>
                   </div>
                 ))}
-                {filtered(tab).length === 0 && (
-                  <p className="text-muted-foreground text-center py-8">No transactions</p>
-                )}
+                {filtered(tab).length === 0 && <p className="text-muted-foreground text-center py-8">No transactions</p>}
               </div>
             </TabsContent>
           ))}
@@ -80,18 +101,14 @@ export default function AdminTransactionsPage() {
 
       <Dialog open={!!txHashDialog} onOpenChange={() => setTxHashDialog(null)}>
         <DialogContent className="glass-card border-border">
-          <DialogHeader>
-            <DialogTitle className="font-display">Approve Withdrawal</DialogTitle>
-          </DialogHeader>
-          <div>
-            <Label>Transaction Hash (optional)</Label>
-            <Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Enter tx hash..." className="bg-secondary border-border font-mono text-sm" />
-          </div>
+          <DialogHeader><DialogTitle className="font-display">Approve Withdrawal</DialogTitle></DialogHeader>
+          <div><Label>Transaction Hash (optional)</Label><Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Enter tx hash..." className="bg-secondary border-border font-mono text-sm" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTxHashDialog(null)}>Cancel</Button>
-            <Button className="gradient-primary text-primary-foreground" onClick={() => { toast.success("Withdrawal approved"); setTxHashDialog(null); setTxHash(""); }}>
-              Confirm Approval
-            </Button>
+            <Button className="gradient-primary text-primary-foreground" onClick={() => {
+              const tx = transactions.find((t) => t.id === txHashDialog);
+              if (tx) handleApprove(tx.id, tx.user_id, Number(tx.amount));
+            }}>Confirm Approval</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
