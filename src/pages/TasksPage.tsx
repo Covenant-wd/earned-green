@@ -12,6 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
+function ensureAbsoluteUrl(url: string) {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return "https://" + url;
+}
+
 export default function TasksPage() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<any[]>([]);
