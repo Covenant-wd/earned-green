@@ -44,7 +44,8 @@ export default function WalletPage() {
       amount: amt,
       type: "withdrawal",
       status: "pending",
-    });
+      wallet_address: walletAddr.trim(),
+    } as any);
     if (error) { toast.error(error.message); return; }
     toast.success("Withdrawal request submitted!");
     setWithdrawOpen(false);

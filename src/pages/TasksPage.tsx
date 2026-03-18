@@ -12,6 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
+function ensureAbsoluteUrl(url: string) {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return "https://" + url;
+}
+
 export default function TasksPage() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<any[]>([]);
@@ -71,7 +77,7 @@ export default function TasksPage() {
       <div className="flex gap-2">
         {task.link && (
           <Button variant="outline" size="sm" asChild>
-            <a href={task.link} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> Visit</a>
+            <a href={ensureAbsoluteUrl(task.link)} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> Visit</a>
           </Button>
         )}
         <Button size="sm" className="gradient-primary text-primary-foreground" onClick={() => { setSelectedTask(task); setSubmitDialogOpen(true); }}>

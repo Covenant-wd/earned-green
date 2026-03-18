@@ -17,22 +17,36 @@ export default function AdminTransactionsPage() {
   const [txHash, setTxHash] = useState("");
 
   const load = async () => {
-    const { data } = await supabase.from("transactions").select("*, profiles:user_id(first_name, last_name, email)").order("created_at", { ascending: false });
-    setTransactions(data || []);
+    // Fetch transactions first
+    const { data: txData } = await supabase.from("transactions").select("*").order("created_at", { ascending: false });
+    if (!txData || txData.length === 0) { setTransactions([]); return; }
+
+    // Fetch profiles separately
+    const userIds = [...new Set(txData.map((t) => t.user_id))];
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("user_id, first_name, last_name, email")
+      .in("user_id", userIds);
+
+    const profileMap = new Map((profilesData || []).map((p) => [p.user_id, p]));
+    const enriched = txData.map((t) => ({ ...t, profile: profileMap.get(t.user_id) || null }));
+    setTransactions(enriched);
   };
 
   useEffect(() => { load(); }, []);
 
   const filtered = (tab: string) =>
     transactions.filter((t) => {
-      if (tab === "withdrawal") return t.type === "withdrawal";
-      return t.status === tab;
+      const matchesSearch = search
+        ? `${t.profile?.first_name || ""} ${t.profile?.last_name || ""} ${t.profile?.email || ""} ${t.type}`.toLowerCase().includes(search.toLowerCase())
+        : true;
+      if (tab === "withdrawal") return t.type === "withdrawal" && matchesSearch;
+      return t.status === tab && matchesSearch;
     });
 
   const handleApprove = async (id: string, userId: string, amount: number) => {
     const { error } = await supabase.from("transactions").update({ status: "completed", tx_hash: txHash || null }).eq("id", id);
     if (error) { toast.error(error.message); return; }
-    // Deduct balance for withdrawal
     const { data: profile } = await supabase.from("profiles").select("usdt_balance").eq("user_id", userId).single();
     if (profile) {
       await supabase.from("profiles").update({ usdt_balance: Math.max(0, Number(profile.usdt_balance) - amount) }).eq("user_id", userId);
@@ -55,14 +69,14 @@ export default function AdminTransactionsPage() {
         <h1 className="page-title mb-6">Transactions</h1>
         <div className="relative mb-6 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="pl-10 bg-secondary border-border" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email or type..." className="pl-10 bg-secondary border-border" />
         </div>
         <Tabs defaultValue="pending">
           <TabsList className="glass-card mb-6">
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="completed">Completed</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-            <TabsTrigger value="withdrawal">Withdrawals</TabsTrigger>
+            <TabsTrigger value="pending">Pending ({filtered("pending").length})</TabsTrigger>
+            <TabsTrigger value="completed">Completed ({filtered("completed").length})</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected ({filtered("rejected").length})</TabsTrigger>
+            <TabsTrigger value="withdrawal">Withdrawals ({filtered("withdrawal").length})</TabsTrigger>
           </TabsList>
           {["pending", "completed", "rejected", "withdrawal"].map((tab) => (
             <TabsContent key={tab} value={tab}>
@@ -72,8 +86,9 @@ export default function AdminTransactionsPage() {
                     <div>
                       <p className="font-medium capitalize">{tx.type.replace("_", " ")}</p>
                       <p className="text-xs text-muted-foreground">
-                        {tx.profiles?.first_name} {tx.profiles?.last_name} • {new Date(tx.created_at).toLocaleDateString()}
+                        {tx.profile?.first_name} {tx.profile?.last_name} ({tx.profile?.email}) • {new Date(tx.created_at).toLocaleDateString()}
                       </p>
+                      {tx.wallet_address && <p className="text-xs font-mono text-muted-foreground">Wallet: {tx.wallet_address}</p>}
                       {tx.tx_hash && <p className="text-xs font-mono text-muted-foreground">TX: {tx.tx_hash}</p>}
                     </div>
                     <div className="flex items-center gap-2">
