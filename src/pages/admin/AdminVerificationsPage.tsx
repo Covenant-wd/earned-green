@@ -10,12 +10,28 @@ export default function AdminVerificationsPage() {
   const [completions, setCompletions] = useState<any[]>([]);
 
   const load = async () => {
-    const { data } = await supabase
+    // First get pending completions with task info
+    const { data: completionsData } = await supabase
       .from("task_completions")
-      .select("*, tasks(*), profiles:user_id(first_name, last_name, email)")
+      .select("*, tasks(*)")
       .eq("status", "pending")
       .order("submitted_at", { ascending: false });
-    setCompletions(data || []);
+
+    if (!completionsData || completionsData.length === 0) {
+      setCompletions([]);
+      return;
+    }
+
+    // Fetch profiles for the user_ids
+    const userIds = [...new Set(completionsData.map((c) => c.user_id))];
+    const { data: profilesData } = await supabase
+      .from("profiles")
+      .select("user_id, first_name, last_name, email")
+      .in("user_id", userIds);
+
+    const profileMap = new Map((profilesData || []).map((p) => [p.user_id, p]));
+    const enriched = completionsData.map((c) => ({ ...c, profile: profileMap.get(c.user_id) || null }));
+    setCompletions(enriched);
   };
 
   useEffect(() => { load(); }, []);
