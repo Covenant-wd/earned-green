@@ -10,6 +10,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import TasksPage from "@/pages/TasksPage";
 import WalletPage from "@/pages/WalletPage";
+import ProfilePage from "@/pages/ProfilePage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminTasksPage from "@/pages/admin/AdminTasksPage";
