@@ -67,7 +67,7 @@ export default function AdminVerificationsPage() {
                 <div>
                   <h3 className="font-display font-semibold">{comp.tasks?.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {comp.profiles?.first_name} {comp.profiles?.last_name} ({comp.profiles?.email}) • {new Date(comp.submitted_at).toLocaleDateString()}
+                    {comp.profile?.first_name} {comp.profile?.last_name} ({comp.profile?.email}) • {new Date(comp.submitted_at).toLocaleDateString()}
                   </p>
                   {comp.proof_url && (
                     <a href={comp.proof_url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline inline-flex items-center gap-1 mt-1">
