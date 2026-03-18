@@ -32,6 +32,7 @@ const userItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Tasks", url: "/tasks", icon: ListChecks },
   { title: "Wallet", url: "/wallet", icon: Wallet },
+  { title: "Profile", url: "/profile", icon: UserCircle },
 ];
 
 const adminItems = [

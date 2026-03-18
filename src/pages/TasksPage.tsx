@@ -59,7 +59,7 @@ export default function TasksPage() {
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-display font-semibold">{task.title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+          <p className="text-sm text-muted-foreground mt-1">{task.description && task.description.startsWith("<") ? <RichTextDisplay content={task.description} /> : task.description}</p>
         </div>
         <span className="font-mono-amount glow-text text-lg">${Number(task.reward_amount).toFixed(2)}</span>
       </div>
