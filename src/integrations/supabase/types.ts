@@ -210,6 +210,7 @@ export type Database = {
           tx_hash: string | null
           type: string
           user_id: string
+          wallet_address: string | null
         }
         Insert: {
           amount: number
@@ -219,6 +220,7 @@ export type Database = {
           tx_hash?: string | null
           type: string
           user_id: string
+          wallet_address?: string | null
         }
         Update: {
           amount?: number
@@ -228,6 +230,7 @@ export type Database = {
           tx_hash?: string | null
           type?: string
           user_id?: string
+          wallet_address?: string | null
         }
         Relationships: []
       }
