@@ -4,16 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "npm@10.9.4",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "serve dist -p $PORT --single",
+    "start": "serve -s dist -l tcp://0.0.0.0:${PORT:-8080}",
     "test": "vitest run",
     "test:watch": "vitest"
-  },
+  }
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",

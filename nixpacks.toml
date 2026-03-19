@@ -2,10 +2,10 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["npm ci"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "node_modules/.bin/serve dist -p $PORT --single"
+cmd = "node_modules/.bin/serve -s dist -l tcp://0.0.0.0:${PORT:-8080}"
