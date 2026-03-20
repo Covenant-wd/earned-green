@@ -30,6 +30,7 @@ export default function DashboardPage() {
       const total = (data || []).reduce((sum, tx) => sum + Number(tx.amount), 0);
       setReferralEarnings(total);
     });
+  }, [user]);
 
   const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
