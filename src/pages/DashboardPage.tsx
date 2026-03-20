@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { DollarSign, Users, ListChecks, Clock, AlertTriangle, Upload } from "lucide-react";
+import { DollarSign, Users, ListChecks, Clock, AlertTriangle, Upload, UserCheck, UserX } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+
+interface Downline {
+  id: string;
+  username: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  registration_status: string;
+  created_at: string;
+}
 
 export default function DashboardPage() {
   const { profile, user, refreshProfile } = useAuth();
@@ -15,6 +26,7 @@ export default function DashboardPage() {
   const [taskStats, setTaskStats] = useState({ active: 0, pending: 0 });
   const [referralEarnings, setReferralEarnings] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [downlines, setDownlines] = useState<Downline[]>([]);
 
   useEffect(() => {
     if (!user) return;
