@@ -25,7 +25,11 @@ export default function DashboardPage() {
     // Fetch task stats
     supabase.from("tasks").select("id", { count: "exact" }).eq("is_active", true).then(({ count }) => setTaskStats((prev) => ({ ...prev, active: count || 0 })));
     supabase.from("task_completions").select("id", { count: "exact" }).eq("user_id", user.id).eq("status", "pending").then(({ count }) => setTaskStats((prev) => ({ ...prev, pending: count || 0 })));
-  }, [user]);
+    // Fetch referral earnings
+    supabase.from("transactions").select("amount").eq("user_id", user.id).eq("type", "referral_bonus").eq("status", "completed").then(({ data }) => {
+      const total = (data || []).reduce((sum, tx) => sum + Number(tx.amount), 0);
+      setReferralEarnings(total);
+    });
 
   const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
