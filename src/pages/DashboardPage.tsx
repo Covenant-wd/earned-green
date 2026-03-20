@@ -190,11 +190,11 @@ export default function DashboardPage() {
                       .map(d => (
                         <div key={d.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                           <div className="flex items-center gap-3">
-                            <div className={`p-1.5 rounded-full ${d.registration_status === "active" ? "bg-emerald-500/10" : "bg-amber-500/10"}`}>
+                            <div className={`p-1.5 rounded-full ${d.registration_status === "active" ? "bg-primary/10" : "bg-warning/10"}`}>
                               {d.registration_status === "active" ? (
-                                <UserCheck className="h-4 w-4 text-emerald-500" />
+                                <UserCheck className="h-4 w-4 text-primary" />
                               ) : (
-                                <UserX className="h-4 w-4 text-amber-500" />
+                                <UserX className="h-4 w-4 text-warning" />
                               )}
                             </div>
                             <div>
