@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [taskStats, setTaskStats] = useState({ active: 0, pending: 0 });
+  const [referralEarnings, setReferralEarnings] = useState(0);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
