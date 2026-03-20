@@ -114,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           username: data.username,
           first_name: data.firstName,
           last_name: data.lastName,
+          referral_code: data.referralCode || "",
         },
       },
     });
