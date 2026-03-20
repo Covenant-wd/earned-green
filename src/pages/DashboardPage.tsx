@@ -37,12 +37,20 @@ export default function DashboardPage() {
     // Fetch task stats
     supabase.from("tasks").select("id", { count: "exact" }).eq("is_active", true).then(({ count }) => setTaskStats((prev) => ({ ...prev, active: count || 0 })));
     supabase.from("task_completions").select("id", { count: "exact" }).eq("user_id", user.id).eq("status", "pending").then(({ count }) => setTaskStats((prev) => ({ ...prev, pending: count || 0 })));
-    // Fetch referral earnings
+     // Fetch referral earnings
     supabase.from("transactions").select("amount").eq("user_id", user.id).eq("type", "referral_bonus").eq("status", "completed").then(({ data }) => {
       const total = (data || []).reduce((sum, tx) => sum + Number(tx.amount), 0);
       setReferralEarnings(total);
     });
   }, [user]);
+
+  // Fetch downlines when profile is available
+  useEffect(() => {
+    if (!profile) return;
+    supabase.rpc("get_user_downlines", { _profile_id: profile.id }).then(({ data }) => {
+      setDownlines((data as Downline[]) || []);
+    });
+  }, [profile]);
 
   const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
