@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard title="USDT Balance" value={profile.usdt_balance} icon={DollarSign} isCurrency />
-          <StatCard title="Referral Earnings" value={0} icon={Users} isCurrency />
+          <StatCard title="Referral Earnings" value={referralEarnings} icon={Users} isCurrency />
           <StatCard title="Active Tasks" value={taskStats.active} icon={ListChecks} />
           <StatCard title="Pending Verifications" value={taskStats.pending} icon={Clock} />
         </div>
