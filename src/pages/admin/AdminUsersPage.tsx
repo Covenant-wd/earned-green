@@ -34,6 +34,23 @@ export default function AdminUsersPage() {
   const updateStatus = async (userId: string, userAuthId: string, status: string, name: string) => {
     const { error } = await supabase.from("profiles").update({ registration_status: status }).eq("user_id", userAuthId);
     if (error) { toast.error(error.message); return; }
+
+    // Credit referral bonus when approving a user
+    if (status === "active") {
+      const { data: approvedProfile } = await supabase.from("profiles").select("referred_by_id").eq("user_id", userAuthId).single();
+      if (approvedProfile?.referred_by_id) {
+        const { data: settings } = await supabase.from("admin_settings").select("registration_fee, referral_bonus_percent").limit(1).single();
+        if (settings) {
+          const bonus = (Number(settings.registration_fee) * Number(settings.referral_bonus_percent)) / 100;
+          const { data: referrer } = await supabase.from("profiles").select("usdt_balance, user_id").eq("id", approvedProfile.referred_by_id).single();
+          if (referrer) {
+            await supabase.from("profiles").update({ usdt_balance: Number(referrer.usdt_balance) + bonus }).eq("id", approvedProfile.referred_by_id);
+            await supabase.from("transactions").insert({ user_id: referrer.user_id, amount: bonus, type: "referral_bonus", status: "completed" });
+          }
+        }
+      }
+    }
+
     toast.success(`${name} ${status === "active" ? "approved" : "rejected"}`);
     loadUsers();
   };

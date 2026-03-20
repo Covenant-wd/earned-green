@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [taskStats, setTaskStats] = useState({ active: 0, pending: 0 });
+  const [referralEarnings, setReferralEarnings] = useState(0);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -24,6 +25,11 @@ export default function DashboardPage() {
     // Fetch task stats
     supabase.from("tasks").select("id", { count: "exact" }).eq("is_active", true).then(({ count }) => setTaskStats((prev) => ({ ...prev, active: count || 0 })));
     supabase.from("task_completions").select("id", { count: "exact" }).eq("user_id", user.id).eq("status", "pending").then(({ count }) => setTaskStats((prev) => ({ ...prev, pending: count || 0 })));
+    // Fetch referral earnings
+    supabase.from("transactions").select("amount").eq("user_id", user.id).eq("type", "referral_bonus").eq("status", "completed").then(({ data }) => {
+      const total = (data || []).reduce((sum, tx) => sum + Number(tx.amount), 0);
+      setReferralEarnings(total);
+    });
   }, [user]);
 
   const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +112,7 @@ export default function DashboardPage() {
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard title="USDT Balance" value={profile.usdt_balance} icon={DollarSign} isCurrency />
-          <StatCard title="Referral Earnings" value={0} icon={Users} isCurrency />
+          <StatCard title="Referral Earnings" value={referralEarnings} icon={Users} isCurrency />
           <StatCard title="Active Tasks" value={taskStats.active} icon={ListChecks} />
           <StatCard title="Pending Verifications" value={taskStats.pending} icon={Clock} />
         </div>
