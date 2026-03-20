@@ -161,6 +161,64 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Downlines Section */}
+        <div className="glass-card p-6 mt-6">
+          <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5" /> My Referrals ({downlines.length})
+          </h2>
+          {downlines.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">
+              No referrals yet. Share your referral code <span className="font-mono font-semibold text-foreground">{profile.referral_code}</span> to invite others!
+            </p>
+          ) : (
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">All ({downlines.length})</TabsTrigger>
+                <TabsTrigger value="active">
+                  Active ({downlines.filter(d => d.registration_status === "active").length})
+                </TabsTrigger>
+                <TabsTrigger value="pending">
+                  Pending ({downlines.filter(d => d.registration_status === "pending").length})
+                </TabsTrigger>
+              </TabsList>
+              {["all", "active", "pending"].map(tab => (
+                <TabsContent key={tab} value={tab}>
+                  <div className="space-y-3">
+                    {downlines
+                      .filter(d => tab === "all" || d.registration_status === tab)
+                      .map(d => (
+                        <div key={d.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-1.5 rounded-full ${d.registration_status === "active" ? "bg-emerald-500/10" : "bg-amber-500/10"}`}>
+                              {d.registration_status === "active" ? (
+                                <UserCheck className="h-4 w-4 text-emerald-500" />
+                              ) : (
+                                <UserX className="h-4 w-4 text-amber-500" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{d.first_name || d.username} {d.last_name || ""}</p>
+                              <p className="text-xs text-muted-foreground">{d.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleDateString()}</span>
+                            <Badge variant={d.registration_status === "active" ? "default" : "secondary"} className="text-xs capitalize">
+                              {d.registration_status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    {downlines.filter(d => tab === "all" || d.registration_status === tab).length === 0 && (
+                      <p className="text-muted-foreground text-center py-4 text-sm">No {tab} referrals</p>
+                    )}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+        </div>
       </motion.div>
     </div>
   );
