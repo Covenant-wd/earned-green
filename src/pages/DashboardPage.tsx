@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { DollarSign, Users, ListChecks, Clock, AlertTriangle, Upload } from "lucide-react";
+import { DollarSign, Users, ListChecks, Clock, AlertTriangle, Upload, UserCheck, UserX } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+
+interface Downline {
+  id: string;
+  username: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  registration_status: string;
+  created_at: string;
+}
 
 export default function DashboardPage() {
   const { profile, user, refreshProfile } = useAuth();
@@ -15,6 +26,7 @@ export default function DashboardPage() {
   const [taskStats, setTaskStats] = useState({ active: 0, pending: 0 });
   const [referralEarnings, setReferralEarnings] = useState(0);
   const [uploading, setUploading] = useState(false);
+  const [downlines, setDownlines] = useState<Downline[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -25,12 +37,20 @@ export default function DashboardPage() {
     // Fetch task stats
     supabase.from("tasks").select("id", { count: "exact" }).eq("is_active", true).then(({ count }) => setTaskStats((prev) => ({ ...prev, active: count || 0 })));
     supabase.from("task_completions").select("id", { count: "exact" }).eq("user_id", user.id).eq("status", "pending").then(({ count }) => setTaskStats((prev) => ({ ...prev, pending: count || 0 })));
-    // Fetch referral earnings
+     // Fetch referral earnings
     supabase.from("transactions").select("amount").eq("user_id", user.id).eq("type", "referral_bonus").eq("status", "completed").then(({ data }) => {
       const total = (data || []).reduce((sum, tx) => sum + Number(tx.amount), 0);
       setReferralEarnings(total);
     });
   }, [user]);
+
+  // Fetch downlines when profile is available
+  useEffect(() => {
+    if (!profile) return;
+    supabase.rpc("get_user_downlines", { _profile_id: profile.id }).then(({ data }) => {
+      setDownlines((data as Downline[]) || []);
+    });
+  }, [profile]);
 
   const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -139,6 +159,64 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Downlines Section */}
+        <div className="glass-card p-6 mt-6">
+          <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5" /> My Referrals ({downlines.length})
+          </h2>
+          {downlines.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">
+              No referrals yet. Share your referral code <span className="font-mono font-semibold text-foreground">{profile.referral_code}</span> to invite others!
+            </p>
+          ) : (
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">All ({downlines.length})</TabsTrigger>
+                <TabsTrigger value="active">
+                  Active ({downlines.filter(d => d.registration_status === "active").length})
+                </TabsTrigger>
+                <TabsTrigger value="pending">
+                  Pending ({downlines.filter(d => d.registration_status === "pending").length})
+                </TabsTrigger>
+              </TabsList>
+              {["all", "active", "pending"].map(tab => (
+                <TabsContent key={tab} value={tab}>
+                  <div className="space-y-3">
+                    {downlines
+                      .filter(d => tab === "all" || d.registration_status === tab)
+                      .map(d => (
+                        <div key={d.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                          <div className="flex items-center gap-3">
+                            <div className={`p-1.5 rounded-full ${d.registration_status === "active" ? "bg-primary/10" : "bg-warning/10"}`}>
+                              {d.registration_status === "active" ? (
+                                <UserCheck className="h-4 w-4 text-primary" />
+                              ) : (
+                                <UserX className="h-4 w-4 text-warning" />
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{d.first_name || d.username} {d.last_name || ""}</p>
+                              <p className="text-xs text-muted-foreground">{d.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-muted-foreground">{new Date(d.created_at).toLocaleDateString()}</span>
+                            <Badge variant={d.registration_status === "active" ? "default" : "secondary"} className="text-xs capitalize">
+                              {d.registration_status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    {downlines.filter(d => tab === "all" || d.registration_status === tab).length === 0 && (
+                      <p className="text-muted-foreground text-center py-4 text-sm">No {tab} referrals</p>
+                    )}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
           )}
         </div>
       </motion.div>
