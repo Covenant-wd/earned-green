@@ -36,7 +36,8 @@ export function RichTextEditor({ content, onChange }: RichTextEditorProps) {
   const addLink = () => {
     const url = window.prompt("Enter URL:");
     if (url) {
-      editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+      const absoluteUrl = url.startsWith("http://") || url.startsWith("https://") ? url : "https://" + url;
+      editor.chain().focus().extendMarkRange("link").setLink({ href: absoluteUrl }).run();
     }
   };
 
