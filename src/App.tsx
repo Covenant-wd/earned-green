@@ -18,6 +18,7 @@ import AdminVerificationsPage from "@/pages/admin/AdminVerificationsPage";
 import AdminTransactionsPage from "@/pages/admin/AdminTransactionsPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
 import NotFound from "@/pages/NotFound";
+import HomePage from "@/pages/HomePage";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +52,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
