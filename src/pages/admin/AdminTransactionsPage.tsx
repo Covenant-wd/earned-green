@@ -88,7 +88,7 @@ export default function AdminTransactionsPage() {
                       <p className="text-xs text-muted-foreground">
                         {tx.profile?.first_name} {tx.profile?.last_name} ({tx.profile?.email}) • {new Date(tx.created_at).toLocaleDateString()}
                       </p>
-                      {tx.wallet_address && <p className="text-xs font-mono text-muted-foreground">Wallet: {tx.wallet_address}</p>}
+                      {tx.wallet_address && <p className="text-xs font-mono text-muted-foreground">MiniPay: {tx.wallet_address}</p>}
                       {tx.tx_hash && <p className="text-xs font-mono text-muted-foreground">TX: {tx.tx_hash}</p>}
                     </div>
                     <div className="flex items-center gap-2">
