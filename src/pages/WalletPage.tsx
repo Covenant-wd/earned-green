@@ -14,7 +14,7 @@ export default function WalletPage() {
   const { user, profile } = useAuth();
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [amount, setAmount] = useState("");
-  const [walletAddr, setWalletAddr] = useState("");
+  const [minipayNumber, setMinipayNumber] = useState("");
   const [copied, setCopied] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
 
@@ -38,19 +38,19 @@ export default function WalletPage() {
     const amt = parseFloat(amount);
     if (isNaN(amt) || amt < 1) { toast.error("Minimum withdrawal is $1.00 USDT"); return; }
     if (amt > profile.usdt_balance) { toast.error("Insufficient balance"); return; }
-    if (!walletAddr.trim()) { toast.error("Enter wallet address"); return; }
+    if (!minipayNumber.trim()) { toast.error("Enter your MiniPay number"); return; }
     const { error } = await supabase.from("transactions").insert({
       user_id: user!.id,
       amount: amt,
       type: "withdrawal",
       status: "pending",
-      wallet_address: walletAddr.trim(),
+      wallet_address: minipayNumber.trim(),
     } as any);
     if (error) { toast.error(error.message); return; }
     toast.success("Withdrawal request submitted!");
     setWithdrawOpen(false);
     setAmount("");
-    setWalletAddr("");
+    setMinipayNumber("");
     const { data } = await supabase.from("transactions").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
     setTransactions(data || []);
   };
@@ -117,7 +117,7 @@ export default function WalletPage() {
           <DialogHeader><DialogTitle className="font-display">Withdraw USDT</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div><Label>Amount (min $1.00)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min="1" step="0.01" /></div>
-            <div><Label>Wallet Address (TRC20)</Label><Input value={walletAddr} onChange={(e) => setWalletAddr(e.target.value)} placeholder="TRC20 wallet address" className="bg-secondary border-border font-mono text-sm" /></div>
+            <div><Label>MiniPay Number</Label><Input value={minipayNumber} onChange={(e) => setMinipayNumber(e.target.value)} placeholder="Enter your MiniPay number" className="bg-secondary border-border font-mono text-sm" /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setWithdrawOpen(false)}>Cancel</Button>

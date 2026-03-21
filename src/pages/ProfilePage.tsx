@@ -17,7 +17,7 @@ export default function ProfilePage() {
     country: "",
     state: "",
     address: "",
-    wallet_address: "",
+    minipay_number: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -30,7 +30,7 @@ export default function ProfilePage() {
         country: profile.country || "",
         state: profile.state || "",
         address: profile.address || "",
-        wallet_address: profile.wallet_address || "",
+        minipay_number: (profile as any).minipay_number || "",
       });
     }
   }, [profile]);
@@ -99,8 +99,8 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <Label>Wallet Address</Label>
-            <Input value={form.wallet_address} onChange={(e) => setForm({ ...form, wallet_address: e.target.value })} className="bg-secondary border-border font-mono text-sm" placeholder="0x..." />
+            <Label>MiniPay Number</Label>
+            <Input value={form.minipay_number} onChange={(e) => setForm({ ...form, minipay_number: e.target.value })} className="bg-secondary border-border font-mono text-sm" placeholder="Enter your MiniPay number" />
           </div>
 
           <div className="glass-card p-4 bg-muted/30 space-y-2">
