@@ -45,12 +45,18 @@ const adminItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { isAdmin, logout, user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setTimeout(() => setOpenMobile(false), 0);
+    }
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -73,7 +79,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {userItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
                       <item.icon className="h-4 w-4" />
@@ -92,7 +98,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)}>
                       <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
                         <item.icon className="h-4 w-4" />
