@@ -9,11 +9,17 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import DashboardPage from "@/pages/DashboardPage";
 import TasksPage from "@/pages/TasksPage";
+import CoursesPage from "@/pages/CoursesPage";
+import CourseDetailPage from "@/pages/CourseDetailPage";
+import GuidesPage from "@/pages/GuidesPage";
 import WalletPage from "@/pages/WalletPage";
 import ProfilePage from "@/pages/ProfilePage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminTasksPage from "@/pages/admin/AdminTasksPage";
+import AdminCoursesPage from "@/pages/admin/AdminCoursesPage";
+import AdminLessonsPage from "@/pages/admin/AdminLessonsPage";
+import AdminGuidesPage from "@/pages/admin/AdminGuidesPage";
 import AdminVerificationsPage from "@/pages/admin/AdminVerificationsPage";
 import AdminTransactionsPage from "@/pages/admin/AdminTransactionsPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
@@ -57,11 +63,17 @@ const App = () => (
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+            <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+            <Route path="/courses/:id" element={<ProtectedRoute><CourseDetailPage /></ProtectedRoute>} />
+            <Route path="/guides" element={<ProtectedRoute><GuidesPage /></ProtectedRoute>} />
             <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/tasks" element={<AdminRoute><AdminTasksPage /></AdminRoute>} />
+            <Route path="/admin/courses" element={<AdminRoute><AdminCoursesPage /></AdminRoute>} />
+            <Route path="/admin/courses/:courseId/lessons" element={<AdminRoute><AdminLessonsPage /></AdminRoute>} />
+            <Route path="/admin/guides" element={<AdminRoute><AdminGuidesPage /></AdminRoute>} />
             <Route path="/admin/verifications" element={<AdminRoute><AdminVerificationsPage /></AdminRoute>} />
             <Route path="/admin/transactions" element={<AdminRoute><AdminTransactionsPage /></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />

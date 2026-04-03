@@ -46,19 +46,19 @@ const steps = [
   {
     n: "02",
     title: "Activate your account",
-    body: "Complete a one-time registration payment to unlock your dashboard. Upload proof and our team verifies quickly.",
+    body: "Complete a one-time registration payment to unlock your dashboard, courses, and earning opportunities.",
     icon: Lock,
   },
   {
     n: "03",
-    title: "Complete tasks & earn",
-    body: "Browse available tasks across social platforms. Complete them, submit proof, and get USDT credited to your balance.",
+    title: "Learn TikTok creation",
+    body: "Access step-by-step courses and guides on TikTok content creation — from scripting to going viral.",
     icon: ListChecks,
   },
   {
     n: "04",
-    title: "Withdraw your earnings",
-    body: "Request a payout anytime via MiniPay. Your earnings land directly in your account — fast and hassle-free.",
+    title: "Complete tasks & earn",
+    body: "Apply what you learn by completing mini tasks. Submit proof, get reviewed, and earn USDT rewards.",
     icon: Wallet,
   },
 ];
@@ -66,8 +66,8 @@ const steps = [
 const features = [
   {
     icon: Zap,
-    title: "Instant task rewards",
-    body: "Tasks are reviewed and credited rapidly. No long waits — your earnings reflect your activity in real time.",
+    title: "Video courses & lessons",
+    body: "Structured TikTok courses with video tutorials, from beginner basics to advanced growth strategies.",
   },
   {
     icon: Users,
@@ -76,13 +76,13 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: "Transparent earnings",
-    body: "Every credit, referral bonus, and withdrawal is logged with full status tracking so you always know where you stand.",
+    title: "Earn while you learn",
+    body: "Complete mini tasks — from social engagements to content creation — and get paid in USDT for every approved submission.",
   },
   {
     icon: Globe,
-    title: "Multiple task categories",
-    body: "From social media engagements to web visits, tasks span platforms so there's always something available to complete.",
+    title: "Tips & guides library",
+    body: "Browse a growing library of TikTok tips, trends, and creator guides written by successful content creators.",
   },
   {
     icon: ShieldCheck,
@@ -92,7 +92,7 @@ const features = [
   {
     icon: Star,
     title: "Growing community",
-    body: "Join a network of earners. The more your downline grows, the more passive referral income flows back to you.",
+    body: "Join a network of creators and earners. Learn together, grow together, and build your TikTok presence.",
   },
 ];
 
@@ -381,7 +381,7 @@ export default function HomePage() {
         }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "hsl(160 84% 45%)", display: "inline-block", boxShadow: "0 0 8px hsl(160 84% 39%)", animation: "pulseGlow 2s ease-in-out infinite" }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.8rem", fontWeight: 500, color: "hsl(160 84% 55%)" }}>
-            Earn real USDT · Withdraw anytime
+            Learn TikTok · Earn USDT · Grow your audience
           </span>
         </div>
 
@@ -396,11 +396,11 @@ export default function HomePage() {
           letterSpacing: "-0.02em",
           marginBottom: "1.5rem",
         }}>
-          Your tasks.
+          Learn TikTok.
           <br />
-          <span className="gradient-text">Your earnings.</span>
+          <span className="gradient-text">Earn rewards.</span>
           <br />
-          Your vault.
+          Build your brand.
         </h1>
 
         {/* Subheading */}
@@ -413,13 +413,13 @@ export default function HomePage() {
           marginBottom: "2.5rem",
           fontWeight: 400,
         }}>
-          EntreVault lets you earn USDT by completing simple tasks and growing your referral network — all from one clean, transparent dashboard.
+          EntreVault teaches you TikTok content creation through structured courses and video tutorials — while you earn USDT by completing mini tasks and growing your referral network.
         </p>
 
         {/* CTA buttons */}
         <div className="hero-btns anim-fade-up-4" style={{ display: "flex", gap: "14px", flexWrap: "wrap", justifyContent: "center", marginBottom: "4rem" }}>
           <button className="ev-btn-primary" style={{ padding: "14px 32px", fontSize: "1rem" }} onClick={() => navigate("/register")}>
-            Start earning today <ArrowRight size={16} />
+            Start learning today <ArrowRight size={16} />
           </button>
           <button className="ev-btn-outline" style={{ padding: "14px 32px", fontSize: "1rem" }} onClick={() => navigate("/login")}>
             Sign in to dashboard
@@ -428,7 +428,7 @@ export default function HomePage() {
 
         {/* Trust row */}
         <div className="anim-fade-in" style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>
-          {["Instant task rewards", "Referral bonuses", "Secure withdrawals"].map((t) => (
+          {["TikTok courses", "Task rewards", "Referral bonuses"].map((t) => (
             <div key={t} style={{ display: "flex", alignItems: "center", gap: "7px", color: "hsl(220 10% 55%)", fontSize: "0.85rem" }}>
               <CheckCircle2 size={14} color="hsl(160 84% 45%)" />
               {t}
