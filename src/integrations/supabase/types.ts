@@ -51,6 +51,7 @@ export type Database = {
           id: string
           last_name: string | null
           middle_name: string | null
+          minipay_number: string | null
           payment_proof_url: string | null
           referral_code: string
           referred_by_id: string | null
@@ -71,6 +72,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           middle_name?: string | null
+          minipay_number?: string | null
           payment_proof_url?: string | null
           referral_code: string
           referred_by_id?: string | null
@@ -91,6 +93,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           middle_name?: string | null
+          minipay_number?: string | null
           payment_proof_url?: string | null
           referral_code?: string
           referred_by_id?: string | null
