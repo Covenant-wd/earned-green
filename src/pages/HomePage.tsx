@@ -381,7 +381,7 @@ export default function HomePage() {
         }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "hsl(160 84% 45%)", display: "inline-block", boxShadow: "0 0 8px hsl(160 84% 39%)", animation: "pulseGlow 2s ease-in-out infinite" }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.8rem", fontWeight: 500, color: "hsl(160 84% 55%)" }}>
-            Earn real USDT · Withdraw anytime
+            Learn TikTok · Earn USDT · Grow your audience
           </span>
         </div>
 
