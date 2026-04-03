@@ -419,7 +419,7 @@ export default function HomePage() {
         {/* CTA buttons */}
         <div className="hero-btns anim-fade-up-4" style={{ display: "flex", gap: "14px", flexWrap: "wrap", justifyContent: "center", marginBottom: "4rem" }}>
           <button className="ev-btn-primary" style={{ padding: "14px 32px", fontSize: "1rem" }} onClick={() => navigate("/register")}>
-            Start earning today <ArrowRight size={16} />
+            Start learning today <ArrowRight size={16} />
           </button>
           <button className="ev-btn-outline" style={{ padding: "14px 32px", fontSize: "1rem" }} onClick={() => navigate("/login")}>
             Sign in to dashboard
