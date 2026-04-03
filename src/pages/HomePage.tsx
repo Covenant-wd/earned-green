@@ -396,11 +396,11 @@ export default function HomePage() {
           letterSpacing: "-0.02em",
           marginBottom: "1.5rem",
         }}>
-          Your tasks.
+          Learn TikTok.
           <br />
-          <span className="gradient-text">Your earnings.</span>
+          <span className="gradient-text">Earn rewards.</span>
           <br />
-          Your vault.
+          Build your brand.
         </h1>
 
         {/* Subheading */}
