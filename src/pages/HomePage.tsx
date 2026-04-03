@@ -413,7 +413,7 @@ export default function HomePage() {
           marginBottom: "2.5rem",
           fontWeight: 400,
         }}>
-          EntreVault lets you earn USDT by completing simple tasks and growing your referral network — all from one clean, transparent dashboard.
+          EntreVault teaches you TikTok content creation through structured courses and video tutorials — while you earn USDT by completing mini tasks and growing your referral network.
         </p>
 
         {/* CTA buttons */}
