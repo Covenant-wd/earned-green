@@ -46,19 +46,19 @@ const steps = [
   {
     n: "02",
     title: "Activate your account",
-    body: "Complete a one-time registration payment to unlock your dashboard. Upload proof and our team verifies quickly.",
+    body: "Complete a one-time registration payment to unlock your dashboard, courses, and earning opportunities.",
     icon: Lock,
   },
   {
     n: "03",
-    title: "Complete tasks & earn",
-    body: "Browse available tasks across social platforms. Complete them, submit proof, and get USDT credited to your balance.",
+    title: "Learn TikTok creation",
+    body: "Access step-by-step courses and guides on TikTok content creation — from scripting to going viral.",
     icon: ListChecks,
   },
   {
     n: "04",
-    title: "Withdraw your earnings",
-    body: "Request a payout anytime via MiniPay. Your earnings land directly in your account — fast and hassle-free.",
+    title: "Complete tasks & earn",
+    body: "Apply what you learn by completing mini tasks. Submit proof, get reviewed, and earn USDT rewards.",
     icon: Wallet,
   },
 ];
@@ -66,8 +66,8 @@ const steps = [
 const features = [
   {
     icon: Zap,
-    title: "Instant task rewards",
-    body: "Tasks are reviewed and credited rapidly. No long waits — your earnings reflect your activity in real time.",
+    title: "Video courses & lessons",
+    body: "Structured TikTok courses with video tutorials, from beginner basics to advanced growth strategies.",
   },
   {
     icon: Users,
@@ -76,13 +76,13 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: "Transparent earnings",
-    body: "Every credit, referral bonus, and withdrawal is logged with full status tracking so you always know where you stand.",
+    title: "Earn while you learn",
+    body: "Complete mini tasks — from social engagements to content creation — and get paid in USDT for every approved submission.",
   },
   {
     icon: Globe,
-    title: "Multiple task categories",
-    body: "From social media engagements to web visits, tasks span platforms so there's always something available to complete.",
+    title: "Tips & guides library",
+    body: "Browse a growing library of TikTok tips, trends, and creator guides written by successful content creators.",
   },
   {
     icon: ShieldCheck,
@@ -92,7 +92,7 @@ const features = [
   {
     icon: Star,
     title: "Growing community",
-    body: "Join a network of earners. The more your downline grows, the more passive referral income flows back to you.",
+    body: "Join a network of creators and earners. Learn together, grow together, and build your TikTok presence.",
   },
 ];
 
