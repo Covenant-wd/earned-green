@@ -428,7 +428,7 @@ export default function HomePage() {
 
         {/* Trust row */}
         <div className="anim-fade-in" style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>
-          {["Instant task rewards", "Referral bonuses", "Secure withdrawals"].map((t) => (
+          {["TikTok courses", "Task rewards", "Referral bonuses"].map((t) => (
             <div key={t} style={{ display: "flex", alignItems: "center", gap: "7px", color: "hsl(220 10% 55%)", fontSize: "0.85rem" }}>
               <CheckCircle2 size={14} color="hsl(160 84% 45%)" />
               {t}
