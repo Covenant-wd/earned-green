@@ -83,6 +83,27 @@ export type Database = {
         }
         Relationships: []
       }
+      email_preferences: {
+        Row: {
+          broadcasts_enabled: boolean
+          transactional_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          broadcasts_enabled?: boolean
+          transactional_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          broadcasts_enabled?: boolean
+          transactional_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       guides: {
         Row: {
           category: string | null
@@ -200,6 +221,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          email_sent: boolean
+          email_status: string | null
+          id: string
+          link: string | null
+          message: string
+          metadata: Json | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent?: boolean
+          email_status?: string | null
+          id?: string
+          link?: string | null
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_sent?: boolean
+          email_status?: string | null
+          id?: string
+          link?: string | null
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {

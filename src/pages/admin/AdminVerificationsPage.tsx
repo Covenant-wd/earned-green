@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RichTextDisplay } from "@/components/RichTextEditor";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "sonner";
 
 function ensureAbsoluteUrl(url: string) {
@@ -44,6 +45,9 @@ export default function AdminVerificationsPage() {
   useEffect(() => { load(); }, []);
 
   const handleAction = async (id: string, status: string, userId: string, rewardAmount: number) => {
+    const completion = completions.find((c) => c.id === id);
+    const taskTitle = completion?.tasks?.title || "your task submission";
+
     const { error } = await supabase.from("task_completions").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
     if (error) { toast.error(error.message); return; }
 
@@ -53,8 +57,22 @@ export default function AdminVerificationsPage() {
         await supabase.from("profiles").update({ usdt_balance: Number(profile.usdt_balance) + rewardAmount }).eq("user_id", userId);
         await supabase.from("transactions").insert({ user_id: userId, amount: rewardAmount, type: "reward", status: "completed" });
       }
+      sendNotification({
+        userId,
+        type: "task_approved",
+        title: "Task approved ✅",
+        message: `Your submission for "${taskTitle}" was approved. $${rewardAmount.toFixed(2)} USDT has been credited to your wallet.`,
+        link: "/wallet",
+      });
       toast.success("Task approved, reward credited");
     } else {
+      sendNotification({
+        userId,
+        type: "task_rejected",
+        title: "Task submission rejected",
+        message: `Your submission for "${taskTitle}" was not approved. Please review the requirements and try again.`,
+        link: "/tasks",
+      });
       toast.error("Task rejected");
     }
     setProofDialog(null);
