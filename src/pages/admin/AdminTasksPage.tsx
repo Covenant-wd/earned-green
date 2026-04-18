@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { broadcastNotification } from "@/lib/notifications";
 import { toast } from "sonner";
 
 export default function AdminTasksPage() {
@@ -42,7 +43,13 @@ export default function AdminTasksPage() {
     } else {
       const { error } = await supabase.from("tasks").insert({ title: form.title, description: form.description, reward_amount: parseFloat(form.rewardAmount), platform: form.platform, link: form.link, category: form.category, difficulty: form.difficulty, created_by: user!.id });
       if (error) { toast.error(error.message); return; }
-      toast.success("Task created");
+      // Notify all active users about the new task
+      broadcastNotification({
+        title: `New task available: ${form.title}`,
+        message: `Earn $${parseFloat(form.rewardAmount).toFixed(2)} USDT for completing "${form.title}". Head to the Tasks page to get started.`,
+        link: "/tasks",
+      });
+      toast.success("Task created and users notified");
     }
     setDialogOpen(false);
     loadTasks();

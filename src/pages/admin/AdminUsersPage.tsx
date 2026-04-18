@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "sonner";
 
 export default function AdminUsersPage() {
@@ -49,6 +50,24 @@ export default function AdminUsersPage() {
           }
         }
       }
+    }
+
+    // Send notification + email
+    if (status === "active") {
+      sendNotification({
+        userId: userAuthId,
+        type: "account_approved",
+        title: "Your account has been approved 🎉",
+        message: `Hi ${name || "there"}, your EntreVault account is now active. You can start completing tasks and earning USDT right away!`,
+        link: "/dashboard",
+      });
+    } else if (status === "rejected") {
+      sendNotification({
+        userId: userAuthId,
+        type: "account_rejected",
+        title: "Account registration update",
+        message: `Hi ${name || "there"}, unfortunately your registration could not be approved at this time. Please contact support if you believe this is an error.`,
+      });
     }
 
     toast.success(`${name} ${status === "active" ? "approved" : "rejected"}`);

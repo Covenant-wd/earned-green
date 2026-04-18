@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import { toast } from "sonner";
 
 export default function AdminTransactionsPage() {
@@ -51,6 +52,13 @@ export default function AdminTransactionsPage() {
     if (profile) {
       await supabase.from("profiles").update({ usdt_balance: Math.max(0, Number(profile.usdt_balance) - amount) }).eq("user_id", userId);
     }
+    sendNotification({
+      userId,
+      type: "withdrawal_approved",
+      title: "Withdrawal processed 💸",
+      message: `Your withdrawal of $${amount.toFixed(2)} USDT has been processed${txHash ? `. Transaction hash: ${txHash}` : "."}`,
+      link: "/wallet",
+    });
     toast.success("Transaction approved");
     setTxHashDialog(null);
     setTxHash("");
@@ -58,7 +66,17 @@ export default function AdminTransactionsPage() {
   };
 
   const handleReject = async (id: string) => {
+    const tx = transactions.find((t) => t.id === id);
     await supabase.from("transactions").update({ status: "rejected" }).eq("id", id);
+    if (tx) {
+      sendNotification({
+        userId: tx.user_id,
+        type: "withdrawal_rejected",
+        title: "Withdrawal rejected",
+        message: `Your withdrawal request of $${Number(tx.amount).toFixed(2)} USDT was rejected. The amount remains in your wallet balance.`,
+        link: "/wallet",
+      });
+    }
     toast.error("Transaction rejected");
     load();
   };
