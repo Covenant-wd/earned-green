@@ -14,6 +14,7 @@ import CourseDetailPage from "@/pages/CourseDetailPage";
 import GuidesPage from "@/pages/GuidesPage";
 import WalletPage from "@/pages/WalletPage";
 import ProfilePage from "@/pages/ProfilePage";
+import NotificationsPage from "@/pages/NotificationsPage";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminTasksPage from "@/pages/admin/AdminTasksPage";
@@ -23,6 +24,7 @@ import AdminGuidesPage from "@/pages/admin/AdminGuidesPage";
 import AdminVerificationsPage from "@/pages/admin/AdminVerificationsPage";
 import AdminTransactionsPage from "@/pages/admin/AdminTransactionsPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
+import AdminBroadcastPage from "@/pages/admin/AdminBroadcastPage";
 import NotFound from "@/pages/NotFound";
 import HomePage from "@/pages/HomePage";
 
@@ -68,6 +70,7 @@ const App = () => (
             <Route path="/guides" element={<ProtectedRoute><GuidesPage /></ProtectedRoute>} />
             <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
             <Route path="/admin/tasks" element={<AdminRoute><AdminTasksPage /></AdminRoute>} />
@@ -76,6 +79,7 @@ const App = () => (
             <Route path="/admin/guides" element={<AdminRoute><AdminGuidesPage /></AdminRoute>} />
             <Route path="/admin/verifications" element={<AdminRoute><AdminVerificationsPage /></AdminRoute>} />
             <Route path="/admin/transactions" element={<AdminRoute><AdminTransactionsPage /></AdminRoute>} />
+            <Route path="/admin/broadcast" element={<AdminRoute><AdminBroadcastPage /></AdminRoute>} />
             <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

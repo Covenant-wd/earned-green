@@ -12,10 +12,14 @@ import {
   UserCircle,
   BookOpen,
   Lightbulb,
+  Bell,
+  Megaphone,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +33,28 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+
+const userItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Courses", url: "/courses", icon: BookOpen },
+  { title: "Guides", url: "/guides", icon: Lightbulb },
+  { title: "Tasks", url: "/tasks", icon: ListChecks },
+  { title: "Wallet", url: "/wallet", icon: Wallet },
+  { title: "Notifications", url: "/notifications", icon: Bell },
+  { title: "Profile", url: "/profile", icon: UserCircle },
+];
+
+const adminItems = [
+  { title: "Overview", url: "/admin", icon: Shield },
+  { title: "Users", url: "/admin/users", icon: Users },
+  { title: "Tasks", url: "/admin/tasks", icon: ListChecks },
+  { title: "Courses", url: "/admin/courses", icon: BookOpen },
+  { title: "Guides", url: "/admin/guides", icon: Lightbulb },
+  { title: "Verifications", url: "/admin/verifications", icon: ClipboardCheck },
+  { title: "Transactions", url: "/admin/transactions", icon: ArrowRightLeft },
+  { title: "Broadcast", url: "/admin/broadcast", icon: Megaphone },
+  { title: "Settings", url: "/admin/settings", icon: Settings },
+];
 
 const userItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
