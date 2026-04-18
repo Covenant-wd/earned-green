@@ -56,26 +56,6 @@ const adminItems = [
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 
-const userItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Courses", url: "/courses", icon: BookOpen },
-  { title: "Guides", url: "/guides", icon: Lightbulb },
-  { title: "Tasks", url: "/tasks", icon: ListChecks },
-  { title: "Wallet", url: "/wallet", icon: Wallet },
-  { title: "Profile", url: "/profile", icon: UserCircle },
-];
-
-const adminItems = [
-  { title: "Overview", url: "/admin", icon: Shield },
-  { title: "Users", url: "/admin/users", icon: Users },
-  { title: "Tasks", url: "/admin/tasks", icon: ListChecks },
-  { title: "Courses", url: "/admin/courses", icon: BookOpen },
-  { title: "Guides", url: "/admin/guides", icon: Lightbulb },
-  { title: "Verifications", url: "/admin/verifications", icon: ClipboardCheck },
-  { title: "Transactions", url: "/admin/transactions", icon: ArrowRightLeft },
-  { title: "Settings", url: "/admin/settings", icon: Settings },
-];
-
 export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
