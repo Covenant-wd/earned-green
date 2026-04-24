@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ALTER COLUMN category SET DEFAULT 'Content Creation & Marketing';

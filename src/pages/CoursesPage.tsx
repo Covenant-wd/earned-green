@@ -53,8 +53,8 @@ export default function CoursesPage() {
     <div className="page-container">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="page-title">Learn TikTok</h1>
-          <p className="text-muted-foreground text-sm mt-1">Master content creation with step-by-step courses</p>
+          <h1 className="page-title">Content Creation & Marketing</h1>
+          <p className="text-muted-foreground text-sm mt-1">Master content creation and digital marketing with step-by-step courses</p>
         </div>
       </div>
 

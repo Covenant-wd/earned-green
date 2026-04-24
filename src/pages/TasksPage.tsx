@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
@@ -22,15 +23,28 @@ export default function TasksPage() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<any[]>([]);
   const [completions, setCompletions] = useState<any[]>([]);
+  const [taskCounts, setTaskCounts] = useState<Record<string, number>>({});
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [proofUrl, setProofUrl] = useState("");
 
-  useEffect(() => {
+  const loadAll = async () => {
     if (!user) return;
-    supabase.from("tasks").select("*").eq("is_active", true).then(({ data }) => setTasks(data || []));
-    supabase.from("task_completions").select("*, tasks(*)").eq("user_id", user.id).then(({ data }) => setCompletions(data || []));
-  }, [user]);
+    const [{ data: tasksData }, { data: completionsData }, { data: allCompletions }] = await Promise.all([
+      supabase.from("tasks").select("*").eq("is_active", true),
+      supabase.from("task_completions").select("*, tasks(*)").eq("user_id", user.id),
+      supabase.from("task_completions").select("task_id, status"),
+    ]);
+    setTasks(tasksData || []);
+    setCompletions(completionsData || []);
+    const counts: Record<string, number> = {};
+    (allCompletions || []).forEach((row: any) => {
+      if (row.status !== "rejected") counts[row.task_id] = (counts[row.task_id] || 0) + 1;
+    });
+    setTaskCounts(counts);
+  };
+
+  useEffect(() => { loadAll(); }, [user]);
 
   const completedTaskIds = completions.map((c) => c.task_id);
   const availableTasks = tasks.filter((t) => !completedTaskIds.includes(t.id));
@@ -49,9 +63,7 @@ export default function TasksPage() {
     toast.success("Task submitted for review!");
     setSubmitDialogOpen(false);
     setProofUrl("");
-    // Refresh
-    const { data } = await supabase.from("task_completions").select("*, tasks(*)").eq("user_id", user.id);
-    setCompletions(data || []);
+    loadAll();
   };
 
   const difficultyColor = (d: string) => {
@@ -60,32 +72,57 @@ export default function TasksPage() {
     return "bg-destructive/10 text-destructive";
   };
 
-  const TaskCard = ({ task }: { task: any }) => (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card-hover p-5">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h3 className="font-display font-semibold">{task.title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{task.description && task.description.startsWith("<") ? <RichTextDisplay content={task.description} /> : task.description}</p>
+  const TaskCard = ({ task }: { task: any }) => {
+    const current = taskCounts[task.id] || 0;
+    const max = task.max_completions;
+    const isFull = max != null && current >= max;
+    const slotsLeft = max != null ? Math.max(0, max - current) : null;
+    const pct = max ? Math.min(100, Math.round((current / max) * 100)) : 0;
+
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card-hover p-5">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="font-display font-semibold">{task.title}</h3>
+            <div className="text-sm text-muted-foreground mt-1">{task.description && task.description.startsWith("<") ? <RichTextDisplay content={task.description} /> : task.description}</div>
+          </div>
+          <span className="font-mono-amount glow-text text-lg">${Number(task.reward_amount).toFixed(2)}</span>
         </div>
-        <span className="font-mono-amount glow-text text-lg">${Number(task.reward_amount).toFixed(2)}</span>
-      </div>
-      <div className="flex items-center gap-2 flex-wrap mb-4">
-        {task.platform && <Badge variant="secondary" className="text-xs">{task.platform}</Badge>}
-        {task.category && <Badge variant="secondary" className="text-xs">{task.category}</Badge>}
-        {task.difficulty && <Badge className={`text-xs ${difficultyColor(task.difficulty)}`}>{task.difficulty}</Badge>}
-      </div>
-      <div className="flex gap-2">
-        {task.link && (
-          <Button variant="outline" size="sm" asChild>
-            <a href={ensureAbsoluteUrl(task.link)} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> Visit</a>
-          </Button>
+        <div className="flex items-center gap-2 flex-wrap mb-3">
+          {task.platform && <Badge variant="secondary" className="text-xs">{task.platform}</Badge>}
+          {task.category && <Badge variant="secondary" className="text-xs">{task.category}</Badge>}
+          {task.difficulty && <Badge className={`text-xs ${difficultyColor(task.difficulty)}`}>{task.difficulty}</Badge>}
+          {max != null && (
+            isFull
+              ? <Badge variant="destructive" className="text-xs">Full</Badge>
+              : <Badge className="text-xs bg-primary/10 text-primary">{slotsLeft} slot{slotsLeft === 1 ? "" : "s"} left</Badge>
+          )}
+        </div>
+        {max != null && (
+          <div className="mb-3">
+            <Progress value={pct} className="h-1.5" />
+            <p className="text-xs text-muted-foreground mt-1 font-mono">{current} / {max} submitted</p>
+          </div>
         )}
-        <Button size="sm" className="gradient-primary text-primary-foreground" onClick={() => { setSelectedTask(task); setSubmitDialogOpen(true); }}>
-          <Send className="h-3 w-3 mr-1" /> Submit Proof
-        </Button>
-      </div>
-    </motion.div>
-  );
+        <div className="flex gap-2">
+          {task.link && (
+            <Button variant="outline" size="sm" asChild>
+              <a href={ensureAbsoluteUrl(task.link)} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> Visit</a>
+            </Button>
+          )}
+          <Button
+            size="sm"
+            className="gradient-primary text-primary-foreground"
+            disabled={isFull}
+            title={isFull ? "Task is full" : undefined}
+            onClick={() => { setSelectedTask(task); setSubmitDialogOpen(true); }}
+          >
+            <Send className="h-3 w-3 mr-1" /> {isFull ? "Task Full" : "Submit Proof"}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="page-container">
