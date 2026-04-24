@@ -51,8 +51,8 @@ const steps = [
   },
   {
     n: "03",
-    title: "Learn TikTok creation",
-    body: "Access step-by-step courses and guides on TikTok content creation — from scripting to going viral.",
+    title: "Learn content creation & marketing",
+    body: "Access step-by-step courses and guides on content creation and digital marketing — from strategy to scaling your audience.",
     icon: ListChecks,
   },
   {
@@ -67,7 +67,7 @@ const features = [
   {
     icon: Zap,
     title: "Video courses & lessons",
-    body: "Structured TikTok courses with video tutorials, from beginner basics to advanced growth strategies.",
+    body: "Structured content creation and marketing courses with video tutorials, from beginner basics to advanced growth strategies.",
   },
   {
     icon: Users,
@@ -82,7 +82,7 @@ const features = [
   {
     icon: Globe,
     title: "Tips & guides library",
-    body: "Browse a growing library of TikTok tips, trends, and creator guides written by successful content creators.",
+    body: "Browse a growing library of content creation tips, marketing playbooks, and creator guides written by experienced marketers.",
   },
   {
     icon: ShieldCheck,
@@ -92,7 +92,7 @@ const features = [
   {
     icon: Star,
     title: "Growing community",
-    body: "Join a network of creators and earners. Learn together, grow together, and build your TikTok presence.",
+    body: "Join a network of creators and marketers. Learn together, grow together, and build your personal brand.",
   },
 ];
 
@@ -381,7 +381,7 @@ export default function HomePage() {
         }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "hsl(160 84% 45%)", display: "inline-block", boxShadow: "0 0 8px hsl(160 84% 39%)", animation: "pulseGlow 2s ease-in-out infinite" }} />
           <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.8rem", fontWeight: 500, color: "hsl(160 84% 55%)" }}>
-            Learn TikTok · Earn USDT · Grow your audience
+            Learn Content & Marketing · Earn USDT · Grow your audience
           </span>
         </div>
 
@@ -396,7 +396,7 @@ export default function HomePage() {
           letterSpacing: "-0.02em",
           marginBottom: "1.5rem",
         }}>
-          Learn TikTok.
+          Master content creation.
           <br />
           <span className="gradient-text">Earn rewards.</span>
           <br />
@@ -413,7 +413,7 @@ export default function HomePage() {
           marginBottom: "2.5rem",
           fontWeight: 400,
         }}>
-          EntreVault teaches you TikTok content creation through structured courses and video tutorials — while you earn USDT by completing mini tasks and growing your referral network.
+          EntreVault teaches you content creation and digital marketing through structured courses and video tutorials — while you earn USDT by completing mini tasks and growing your referral network.
         </p>
 
         {/* CTA buttons */}
@@ -428,7 +428,7 @@ export default function HomePage() {
 
         {/* Trust row */}
         <div className="anim-fade-in" style={{ display: "flex", gap: "24px", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>
-          {["TikTok courses", "Task rewards", "Referral bonuses"].map((t) => (
+          {["Marketing courses", "Task rewards", "Referral bonuses"].map((t) => (
             <div key={t} style={{ display: "flex", alignItems: "center", gap: "7px", color: "hsl(220 10% 55%)", fontSize: "0.85rem" }}>
               <CheckCircle2 size={14} color="hsl(160 84% 45%)" />
               {t}
