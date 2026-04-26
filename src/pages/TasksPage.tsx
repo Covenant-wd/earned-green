@@ -73,7 +73,9 @@ export default function TasksPage() {
   };
 
   const TaskCard = ({ task }: { task: any }) => {
-    const current = taskCounts[task.id] || 0;
+    const onPlatform = taskCounts[task.id] || 0;
+    const external = task.external_completions || 0;
+    const current = onPlatform + external;
     const max = task.max_completions;
     const isFull = max != null && current >= max;
     const slotsLeft = max != null ? Math.max(0, max - current) : null;
@@ -101,7 +103,7 @@ export default function TasksPage() {
         {max != null && (
           <div className="mb-3">
             <Progress value={pct} className="h-1.5" />
-            <p className="text-xs text-muted-foreground mt-1 font-mono">{current} / {max} submitted</p>
+            <p className="text-xs text-muted-foreground mt-1 font-mono">{current} / {max} taken</p>
           </div>
         )}
         <div className="flex gap-2">
