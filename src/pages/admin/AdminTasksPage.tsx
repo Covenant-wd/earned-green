@@ -91,7 +91,7 @@ export default function AdminTasksPage() {
     } else {
       const { error } = await supabase.from("tasks").insert({ ...payload, created_by: user!.id });
       if (error) { toast.error(error.message); return; }
-      broadcastNotification({
+      await broadcastNotification({
         title: `New task available: ${form.title}`,
         message: `Earn $${parseFloat(form.rewardAmount).toFixed(2)} USDT for completing "${form.title}". Head to the Tasks page to get started.`,
         link: "/tasks",

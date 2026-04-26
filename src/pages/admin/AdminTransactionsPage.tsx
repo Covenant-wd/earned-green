@@ -52,7 +52,7 @@ export default function AdminTransactionsPage() {
     if (profile) {
       await supabase.from("profiles").update({ usdt_balance: Math.max(0, Number(profile.usdt_balance) - amount) }).eq("user_id", userId);
     }
-    sendNotification({
+    await sendNotification({
       userId,
       type: "withdrawal_approved",
       title: "Withdrawal processed 💸",
@@ -69,7 +69,7 @@ export default function AdminTransactionsPage() {
     const tx = transactions.find((t) => t.id === id);
     await supabase.from("transactions").update({ status: "rejected" }).eq("id", id);
     if (tx) {
-      sendNotification({
+      await sendNotification({
         userId: tx.user_id,
         type: "withdrawal_rejected",
         title: "Withdrawal rejected",

@@ -55,7 +55,7 @@ export default function AdminVerificationsPage() {
         await supabase.from("profiles").update({ usdt_balance: Number(profile.usdt_balance) + rewardAmount }).eq("user_id", userId);
         await supabase.from("transactions").insert({ user_id: userId, amount: rewardAmount, type: "reward", status: "completed" });
       }
-      sendNotification({
+      await sendNotification({
         userId,
         type: "task_approved",
         title: "Task approved ✅",
@@ -64,7 +64,7 @@ export default function AdminVerificationsPage() {
       });
       toast.success("Task approved, reward credited");
     } else {
-      sendNotification({
+      await sendNotification({
         userId,
         type: "task_rejected",
         title: "Task submission rejected",
@@ -80,7 +80,7 @@ export default function AdminVerificationsPage() {
   const handleAllowRetry = async (comp: any) => {
     const { error } = await supabase.from("task_completions").delete().eq("id", comp.id);
     if (error) { toast.error(error.message); return; }
-    sendNotification({
+    await sendNotification({
       userId: comp.user_id,
       type: "task_retry_allowed",
       title: "You can retry a task 🔄",

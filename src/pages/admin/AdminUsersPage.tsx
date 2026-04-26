@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
 
     // Send notification + email
     if (status === "active") {
-      sendNotification({
+      await sendNotification({
         userId: userAuthId,
         type: "account_approved",
         title: "Your account has been approved 🎉",
@@ -62,7 +62,7 @@ export default function AdminUsersPage() {
         link: "/dashboard",
       });
     } else if (status === "rejected") {
-      sendNotification({
+      await sendNotification({
         userId: userAuthId,
         type: "account_rejected",
         title: "Account registration update",
