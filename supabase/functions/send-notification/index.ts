@@ -6,11 +6,11 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
+// Calls Resend directly — no third-party gateway needed.
+const RESEND_API_URL = "https://api.resend.com/emails";
 
-// Update these to match your verified Resend sender.
-// Default sender uses Resend's sandbox domain so it works without DNS setup.
-const FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <support@entrevault.online>";
+const FROM_EMAIL =
+  Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <support@entrevault.online>";
 
 interface NotificationBody {
   userId?: string;
@@ -31,23 +31,34 @@ function escapeHtml(s: string) {
     .replace(/'/g, "&#039;");
 }
 
-function buildEmailHtml(opts: { name: string; title: string; message: string; link?: string | null }) {
-  const appUrl = Deno.env.get("APP_PUBLIC_URL") || "";
+function buildEmailHtml(opts: {
+  name: string;
+  title: string;
+  message: string;
+  link?: string | null;
+}) {
+  const appUrl = Deno.env.get("APP_PUBLIC_URL") || "https://entrevault.online";
   const fullLink = opts.link
-    ? (opts.link.startsWith("http") ? opts.link : `${appUrl}${opts.link}`)
+    ? opts.link.startsWith("http")
+      ? opts.link
+      : `${appUrl}${opts.link}`
     : null;
 
   return `<!doctype html>
 <html><body style="margin:0;padding:0;background:#0b0f0d;font-family:Arial,Helvetica,sans-serif;color:#e6f4ee;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0f0d;padding:24px 0;">
     <tr><td align="center">
-      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#11181550;border:1px solid #1f3a2d;border-radius:12px;padding:28px;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#111815;border:1px solid #1f3a2d;border-radius:12px;padding:28px;">
         <tr><td>
           <h1 style="margin:0 0 16px;font-size:20px;color:#10b981;">EntreVault</h1>
           <p style="margin:0 0 8px;font-size:15px;">Hi ${escapeHtml(opts.name)},</p>
           <h2 style="margin:8px 0 12px;font-size:18px;color:#ffffff;">${escapeHtml(opts.title)}</h2>
           <p style="margin:0 0 20px;font-size:14px;line-height:1.55;color:#cfe9dd;">${escapeHtml(opts.message)}</p>
-          ${fullLink ? `<p style="margin:24px 0;"><a href="${escapeHtml(fullLink)}" style="display:inline-block;background:#10b981;color:#06231a;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:8px;">Open EntreVault</a></p>` : ""}
+          ${
+            fullLink
+              ? `<p style="margin:24px 0;"><a href="${escapeHtml(fullLink)}" style="display:inline-block;background:#10b981;color:#06231a;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:8px;">Open EntreVault</a></p>`
+              : ""
+          }
           <hr style="border:none;border-top:1px solid #1f3a2d;margin:24px 0;" />
           <p style="margin:0;font-size:12px;color:#6b8a7d;">You are receiving this because you have an active EntreVault account.</p>
         </td></tr>
@@ -62,14 +73,12 @@ async function sendResendEmail(args: {
   subject: string;
   html: string;
   apiKey: string;
-  lovableKey: string;
 }) {
-  const res = await fetch(`${GATEWAY_URL}/emails`, {
+  const res = await fetch(RESEND_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${args.lovableKey}`,
-      "X-Connection-Api-Key": args.apiKey,
+      Authorization: `Bearer ${args.apiKey}`,
     },
     body: JSON.stringify({
       from: FROM_EMAIL,
@@ -78,6 +87,7 @@ async function sendResendEmail(args: {
       html: args.html,
     }),
   });
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(`Resend error ${res.status}: ${JSON.stringify(data)}`);
@@ -97,7 +107,6 @@ Deno.serve(async (req) => {
     );
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     const body: NotificationBody = await req.json();
     const { type, title, message, link, metadata, broadcast } = body;
@@ -105,12 +114,19 @@ Deno.serve(async (req) => {
     if (!type || !title || !message) {
       return new Response(
         JSON.stringify({ error: "type, title, message required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     // Resolve recipients
-    let recipients: { user_id: string; email: string; first_name: string | null }[] = [];
+    let recipients: {
+      user_id: string;
+      email: string;
+      first_name: string | null;
+    }[] = [];
 
     if (broadcast) {
       const { data, error } = await supabase
@@ -148,16 +164,18 @@ Deno.serve(async (req) => {
       email_status: "pending",
     }));
 
-    const { error: insertError } = await supabase.from("notifications").insert(rows);
+    const { error: insertError } = await supabase
+      .from("notifications")
+      .insert(rows);
     if (insertError) throw insertError;
 
-    // Send emails via Resend gateway
+    // Send emails directly via Resend API
     let emailsAttempted = 0;
     let emailsSent = 0;
     const emailErrors: string[] = [];
 
-    if (!RESEND_API_KEY || !LOVABLE_API_KEY) {
-      emailErrors.push("Resend not configured (missing RESEND_API_KEY or LOVABLE_API_KEY)");
+    if (!RESEND_API_KEY) {
+      emailErrors.push("Resend not configured — set RESEND_API_KEY in Supabase Edge Function secrets.");
     } else {
       for (const r of recipients) {
         emailsAttempted++;
@@ -173,11 +191,27 @@ Deno.serve(async (req) => {
             subject: title,
             html,
             apiKey: RESEND_API_KEY,
-            lovableKey: LOVABLE_API_KEY,
           });
+
+          // Mark email as sent in the notifications table
+          await supabase
+            .from("notifications")
+            .update({ email_sent: true, email_status: "sent" })
+            .eq("user_id", r.user_id)
+            .eq("title", title)
+            .eq("email_status", "pending");
+
           emailsSent++;
         } catch (e: any) {
           emailErrors.push(`${r.email}: ${e?.message || String(e)}`);
+
+          // Mark as failed
+          await supabase
+            .from("notifications")
+            .update({ email_status: "failed" })
+            .eq("user_id", r.user_id)
+            .eq("title", title)
+            .eq("email_status", "pending");
         }
       }
     }
@@ -196,7 +230,10 @@ Deno.serve(async (req) => {
     console.error("send-notification error:", err);
     return new Response(
       JSON.stringify({ error: err?.message || "Internal error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   }
 });
