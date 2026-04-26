@@ -6,6 +6,8 @@ export type NotificationType =
   | "account_rejected"
   | "task_approved"
   | "task_rejected"
+  | "task_retry_allowed"
+  | "task_closed"
   | "withdrawal_approved"
   | "withdrawal_rejected"
   | "new_task"
