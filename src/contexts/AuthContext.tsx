@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { sendNotification } from "@/lib/notifications";
 import type { User } from "@supabase/supabase-js";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -106,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     lastName: string;
     referralCode?: string;
   }) => {
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -120,9 +121,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     if (error) return { error: error.message };
 
-    // If referral code provided, handle it after profile is created
-    if (data.referralCode) {
-      // Will be handled via edge function or after profile creation
+    // Send welcome notification + email.
+    // We delay 2 s so the DB trigger has time to create the profile row
+    // before the edge function tries to look it up.
+    const newUserId = signUpData?.user?.id;
+    if (newUserId) {
+      setTimeout(() => {
+        sendNotification({
+          userId: newUserId,
+          type: "welcome",
+          title: "Welcome to EntreVault! 🎉",
+          message: `Hi ${data.firstName || "there"}, your registration has been received and is under review. We'll notify you as soon as an admin approves your account.`,
+          link: "/dashboard",
+        });
+      }, 2000);
     }
 
     return {};
