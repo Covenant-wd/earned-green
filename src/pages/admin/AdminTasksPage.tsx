@@ -38,7 +38,7 @@ export default function AdminTasksPage() {
 
   const openCreate = () => {
     setEditingTask(null);
-    setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "" });
+    setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
     setDialogOpen(true);
   };
   const openEdit = (task: any) => {
@@ -52,6 +52,7 @@ export default function AdminTasksPage() {
       category: task.category || "",
       difficulty: task.difficulty || "Easy",
       maxCompletions: task.max_completions != null ? String(task.max_completions) : "",
+      externalCompletions: String(task.external_completions ?? 0),
     });
     setDialogOpen(true);
   };
@@ -63,6 +64,15 @@ export default function AdminTasksPage() {
       toast.error("Max submissions must be a positive number, or leave blank for unlimited");
       return;
     }
+    const externalCompletions = form.externalCompletions.trim() === "" ? 0 : parseInt(form.externalCompletions, 10);
+    if (isNaN(externalCompletions) || externalCompletions < 0) {
+      toast.error("External submissions must be 0 or greater");
+      return;
+    }
+    if (maxCompletions !== null && externalCompletions > maxCompletions) {
+      toast.error("External submissions cannot exceed max submissions");
+      return;
+    }
     const payload = {
       title: form.title,
       description: form.description,
@@ -72,6 +82,7 @@ export default function AdminTasksPage() {
       category: form.category,
       difficulty: form.difficulty,
       max_completions: maxCompletions,
+      external_completions: externalCompletions,
     };
     if (editingTask) {
       const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
