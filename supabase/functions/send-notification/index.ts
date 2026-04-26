@@ -164,10 +164,16 @@ Deno.serve(async (req) => {
       email_status: "pending",
     }));
 
-    const { error: insertError } = await supabase
+    const { data: insertedRows, error: insertError } = await supabase
       .from("notifications")
-      .insert(rows);
+      .insert(rows)
+      .select("id, user_id");
     if (insertError) throw insertError;
+
+    // Map user_id → notification id for precise status updates
+    const notifIdMap = new Map<string, string>(
+      (insertedRows || []).map((r: any) => [r.user_id, r.id])
+    );
 
     // Send emails directly via Resend API
     let emailsAttempted = 0;
@@ -179,6 +185,7 @@ Deno.serve(async (req) => {
     } else {
       for (const r of recipients) {
         emailsAttempted++;
+        const notifId = notifIdMap.get(r.user_id);
         try {
           const html = buildEmailHtml({
             name: r.first_name || "there",
@@ -193,25 +200,25 @@ Deno.serve(async (req) => {
             apiKey: RESEND_API_KEY,
           });
 
-          // Mark email as sent in the notifications table
-          await supabase
-            .from("notifications")
-            .update({ email_sent: true, email_status: "sent" })
-            .eq("user_id", r.user_id)
-            .eq("title", title)
-            .eq("email_status", "pending");
+          // Mark email as sent using the exact notification id
+          if (notifId) {
+            await supabase
+              .from("notifications")
+              .update({ email_sent: true, email_status: "sent" })
+              .eq("id", notifId);
+          }
 
           emailsSent++;
         } catch (e: any) {
           emailErrors.push(`${r.email}: ${e?.message || String(e)}`);
 
-          // Mark as failed
-          await supabase
-            .from("notifications")
-            .update({ email_status: "failed" })
-            .eq("user_id", r.user_id)
-            .eq("title", title)
-            .eq("email_status", "pending");
+          // Mark as failed using the exact notification id
+          if (notifId) {
+            await supabase
+              .from("notifications")
+              .update({ email_status: "failed" })
+              .eq("id", notifId);
+          }
         }
       }
     }
