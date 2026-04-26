@@ -192,18 +192,33 @@ export default function AdminTasksPage() {
                 </Select>
               </div>
             </div>
-            <div>
-              <Label>Max submissions (leave blank for unlimited)</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="e.g. 100"
-                value={form.maxCompletions}
-                onChange={(e) => setForm({ ...form, maxCompletions: e.target.value })}
-                className="bg-secondary border-border font-mono"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Task will auto-close once this number of submissions is reached. You can also close it manually anytime.</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Max submissions (blank = unlimited)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 100"
+                  value={form.maxCompletions}
+                  onChange={(e) => setForm({ ...form, maxCompletions: e.target.value })}
+                  className="bg-secondary border-border font-mono"
+                />
+              </div>
+              <div>
+                <Label>External submissions (off-platform)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={form.externalCompletions}
+                  onChange={(e) => setForm({ ...form, externalCompletions: e.target.value })}
+                  className="bg-secondary border-border font-mono"
+                />
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground -mt-1">
+              Use "External submissions" to record people you hired off-platform. Slots-left for users = max − (on-platform + external). Task auto-closes when total reaches max.
+            </p>
             <div><Label>Link (optional)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="bg-secondary border-border" /></div>
           </div>
           <DialogFooter>
