@@ -126,7 +126,9 @@ export default function AdminTasksPage() {
         </div>
         <div className="space-y-3">
           {tasks.map((task) => {
-            const current = counts[task.id] || 0;
+            const onPlatform = counts[task.id] || 0;
+            const external = task.external_completions || 0;
+            const current = onPlatform + external;
             const max = task.max_completions;
             const pct = max ? Math.min(100, Math.round((current / max) * 100)) : 0;
             const isFull = max != null && current >= max;
@@ -140,9 +142,12 @@ export default function AdminTasksPage() {
                     {isFull && task.is_active && <Badge variant="destructive" className="text-xs">Full</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground truncate">{task.description?.replace(/<[^>]+>/g, "")}</p>
-                  <div className="mt-2 flex items-center gap-2">
+                  <div className="mt-2 flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-muted-foreground font-mono">
-                      {current} / {max ?? "∞"} submitted
+                      {current} / {max ?? "∞"} total
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      ({onPlatform} on-platform + {external} external)
                     </span>
                     {max != null && (
                       <Progress value={pct} className="h-1.5 flex-1 max-w-[200px]" />
