@@ -6,11 +6,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-// Calls Resend directly — no third-party gateway needed.
 const RESEND_API_URL = "https://api.resend.com/emails";
 
 const FROM_EMAIL =
   Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <support@entrevault.online>";
+
+// Broadcast-type notifications check broadcasts_enabled preference.
+// Everything else (account, task result, withdrawal) is transactional.
+const BROADCAST_TYPES = new Set(["broadcast", "new_task", "task_closed"]);
 
 interface NotificationBody {
   userId?: string;
@@ -121,20 +124,22 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Resolve recipients
-    let recipients: {
+    const isBroadcastType = broadcast || BROADCAST_TYPES.has(type);
+
+    // ── Resolve recipient candidates ──────────────────────────────────────────
+    let candidates: {
       user_id: string;
       email: string;
       first_name: string | null;
     }[] = [];
 
-    if (broadcast) {
+    if (isBroadcastType) {
       const { data, error } = await supabase
         .from("profiles")
         .select("user_id, email, first_name")
         .eq("registration_status", "active");
       if (error) throw error;
-      recipients = data || [];
+      candidates = data || [];
     } else if (body.userId) {
       const { data, error } = await supabase
         .from("profiles")
@@ -142,17 +147,58 @@ Deno.serve(async (req) => {
         .eq("user_id", body.userId)
         .maybeSingle();
       if (error) throw error;
-      if (data) recipients = [data];
+      if (data) candidates = [data];
     }
 
-    if (recipients.length === 0) {
+    if (candidates.length === 0) {
       return new Response(
         JSON.stringify({ ok: true, sent: 0, note: "No recipients" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    // Insert in-app notifications first (so they appear even if email fails)
+    // ── Ensure every candidate has an email_preferences row ──────────────────
+    // New users won't have one yet because the handle_new_user DB trigger
+    // doesn't create it. Upsert defaults so the join below never silently
+    // drops a valid recipient.
+    const prefUpserts = candidates.map((c) => ({
+      user_id: c.user_id,
+      transactional_enabled: true,
+      broadcasts_enabled: true,
+    }));
+    await supabase
+      .from("email_preferences")
+      .upsert(prefUpserts, { onConflict: "user_id", ignoreDuplicates: true });
+
+    // ── Fetch preferences and filter opted-out users ──────────────────────────
+    const userIds = candidates.map((c) => c.user_id);
+    const { data: prefs, error: prefsError } = await supabase
+      .from("email_preferences")
+      .select("user_id, transactional_enabled, broadcasts_enabled")
+      .in("user_id", userIds);
+    if (prefsError) throw prefsError;
+
+    const prefMap = new Map(
+      (prefs || []).map((p: any) => [p.user_id, p])
+    );
+
+    const prefColumn = isBroadcastType
+      ? "broadcasts_enabled"
+      : "transactional_enabled";
+
+    const recipients = candidates.filter((c) => {
+      const pref = prefMap.get(c.user_id);
+      return pref ? pref[prefColumn] !== false : true;
+    });
+
+    if (recipients.length === 0) {
+      return new Response(
+        JSON.stringify({ ok: true, sent: 0, note: "All recipients opted out of email" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // ── Insert in-app notifications ───────────────────────────────────────────
     const rows = recipients.map((r) => ({
       user_id: r.user_id,
       type,
@@ -170,18 +216,20 @@ Deno.serve(async (req) => {
       .select("id, user_id");
     if (insertError) throw insertError;
 
-    // Map user_id → notification id for precise status updates
+    // Map user_id → notification id for precise per-row status updates
     const notifIdMap = new Map<string, string>(
       (insertedRows || []).map((r: any) => [r.user_id, r.id])
     );
 
-    // Send emails directly via Resend API
+    // ── Send emails via Resend ────────────────────────────────────────────────
     let emailsAttempted = 0;
     let emailsSent = 0;
     const emailErrors: string[] = [];
 
     if (!RESEND_API_KEY) {
-      emailErrors.push("Resend not configured — set RESEND_API_KEY in Supabase Edge Function secrets.");
+      emailErrors.push(
+        "Resend not configured — set RESEND_API_KEY in Supabase Edge Function secrets."
+      );
     } else {
       for (const r of recipients) {
         emailsAttempted++;
@@ -200,7 +248,6 @@ Deno.serve(async (req) => {
             apiKey: RESEND_API_KEY,
           });
 
-          // Mark email as sent using the exact notification id
           if (notifId) {
             await supabase
               .from("notifications")
@@ -212,7 +259,6 @@ Deno.serve(async (req) => {
         } catch (e: any) {
           emailErrors.push(`${r.email}: ${e?.message || String(e)}`);
 
-          // Mark as failed using the exact notification id
           if (notifId) {
             await supabase
               .from("notifications")
