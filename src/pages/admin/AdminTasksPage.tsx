@@ -113,6 +113,16 @@ export default function AdminTasksPage() {
     const newActive = !task.is_active;
     const { error } = await supabase.from("tasks").update({ is_active: newActive }).eq("id", task.id);
     if (error) { toast.error(error.message); return; }
+
+    // Broadcast to all active users when a task is closed
+    if (!newActive) {
+      await broadcastNotification({
+        title: `Task closed: ${task.title}`,
+        message: `The task "${task.title}" has been closed and is no longer accepting new submissions.`,
+        link: "/tasks",
+      });
+    }
+
     toast.success(newActive ? "Task reopened" : "Task closed — users notified");
     loadTasks();
   };
