@@ -416,6 +416,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           difficulty: string | null
+          external_completions: number
           id: string
           is_active: boolean
           link: string | null
@@ -432,6 +433,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           difficulty?: string | null
+          external_completions?: number
           id?: string
           is_active?: boolean
           link?: string | null
@@ -448,6 +450,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           difficulty?: string | null
+          external_completions?: number
           id?: string
           is_active?: boolean
           link?: string | null
