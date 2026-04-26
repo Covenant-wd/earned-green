@@ -10,7 +10,7 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
 // Update these to match your verified Resend sender.
 // Default sender uses Resend's sandbox domain so it works without DNS setup.
-const FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <onboarding@resend.dev>";
+const FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <support@entrevault.online>";
 
 interface NotificationBody {
   userId?: string;
