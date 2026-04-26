@@ -20,7 +20,7 @@ export default function AdminTasksPage() {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
-  const [form, setForm] = useState({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "" });
+  const [form, setForm] = useState({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
 
   const loadTasks = async () => {
     const { data } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
@@ -38,7 +38,7 @@ export default function AdminTasksPage() {
 
   const openCreate = () => {
     setEditingTask(null);
-    setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "" });
+    setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
     setDialogOpen(true);
   };
   const openEdit = (task: any) => {
@@ -52,6 +52,7 @@ export default function AdminTasksPage() {
       category: task.category || "",
       difficulty: task.difficulty || "Easy",
       maxCompletions: task.max_completions != null ? String(task.max_completions) : "",
+      externalCompletions: String(task.external_completions ?? 0),
     });
     setDialogOpen(true);
   };
@@ -63,6 +64,15 @@ export default function AdminTasksPage() {
       toast.error("Max submissions must be a positive number, or leave blank for unlimited");
       return;
     }
+    const externalCompletions = form.externalCompletions.trim() === "" ? 0 : parseInt(form.externalCompletions, 10);
+    if (isNaN(externalCompletions) || externalCompletions < 0) {
+      toast.error("External submissions must be 0 or greater");
+      return;
+    }
+    if (maxCompletions !== null && externalCompletions > maxCompletions) {
+      toast.error("External submissions cannot exceed max submissions");
+      return;
+    }
     const payload = {
       title: form.title,
       description: form.description,
@@ -72,6 +82,7 @@ export default function AdminTasksPage() {
       category: form.category,
       difficulty: form.difficulty,
       max_completions: maxCompletions,
+      external_completions: externalCompletions,
     };
     if (editingTask) {
       const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
@@ -115,7 +126,9 @@ export default function AdminTasksPage() {
         </div>
         <div className="space-y-3">
           {tasks.map((task) => {
-            const current = counts[task.id] || 0;
+            const onPlatform = counts[task.id] || 0;
+            const external = task.external_completions || 0;
+            const current = onPlatform + external;
             const max = task.max_completions;
             const pct = max ? Math.min(100, Math.round((current / max) * 100)) : 0;
             const isFull = max != null && current >= max;
@@ -129,9 +142,12 @@ export default function AdminTasksPage() {
                     {isFull && task.is_active && <Badge variant="destructive" className="text-xs">Full</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground truncate">{task.description?.replace(/<[^>]+>/g, "")}</p>
-                  <div className="mt-2 flex items-center gap-2">
+                  <div className="mt-2 flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-muted-foreground font-mono">
-                      {current} / {max ?? "∞"} submitted
+                      {current} / {max ?? "∞"} total
+                    </span>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      ({onPlatform} on-platform + {external} external)
                     </span>
                     {max != null && (
                       <Progress value={pct} className="h-1.5 flex-1 max-w-[200px]" />
@@ -176,18 +192,33 @@ export default function AdminTasksPage() {
                 </Select>
               </div>
             </div>
-            <div>
-              <Label>Max submissions (leave blank for unlimited)</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="e.g. 100"
-                value={form.maxCompletions}
-                onChange={(e) => setForm({ ...form, maxCompletions: e.target.value })}
-                className="bg-secondary border-border font-mono"
-              />
-              <p className="text-xs text-muted-foreground mt-1">Task will auto-close once this number of submissions is reached. You can also close it manually anytime.</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Max submissions (blank = unlimited)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 100"
+                  value={form.maxCompletions}
+                  onChange={(e) => setForm({ ...form, maxCompletions: e.target.value })}
+                  className="bg-secondary border-border font-mono"
+                />
+              </div>
+              <div>
+                <Label>External submissions (off-platform)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={form.externalCompletions}
+                  onChange={(e) => setForm({ ...form, externalCompletions: e.target.value })}
+                  className="bg-secondary border-border font-mono"
+                />
+              </div>
             </div>
+            <p className="text-xs text-muted-foreground -mt-1">
+              Use "External submissions" to record people you hired off-platform. Slots-left for users = max − (on-platform + external). Task auto-closes when total reaches max.
+            </p>
             <div><Label>Link (optional)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="bg-secondary border-border" /></div>
           </div>
           <DialogFooter>
