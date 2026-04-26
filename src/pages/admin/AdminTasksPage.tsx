@@ -20,7 +20,7 @@ export default function AdminTasksPage() {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
-  const [form, setForm] = useState({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "" });
+  const [form, setForm] = useState({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
 
   const loadTasks = async () => {
     const { data } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
