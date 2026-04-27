@@ -163,10 +163,10 @@ export default function AdminVerificationsPage() {
                       <Button size="sm" variant="outline" onClick={() => setProofDialog(comp)}>
                         <Eye className="h-3 w-3 mr-1" /> View Proof
                       </Button>
-                      <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(comp.id, "approved", comp.user_id, Number(comp.tasks?.reward_amount))}>
-                        <Check className="h-3 w-3 mr-1" /> Approve
+                      <Button size="sm" disabled={pendingIds.has(comp.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(comp.id, "approved", comp.user_id, Number(comp.tasks?.reward_amount))}>
+                        <Check className="h-3 w-3 mr-1" /> {pendingIds.has(comp.id) ? "Processing..." : "Approve"}
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleAction(comp.id, "rejected", comp.user_id, 0)}>
+                      <Button size="sm" disabled={pendingIds.has(comp.id)} variant="destructive" onClick={() => handleAction(comp.id, "rejected", comp.user_id, 0)}>
                         <X className="h-3 w-3 mr-1" /> Reject
                       </Button>
                     </div>
