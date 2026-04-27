@@ -275,10 +275,10 @@ export default function AdminVerificationsPage() {
 
               {proofDialog.status === "pending" ? (
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(proofDialog.id, "approved", proofDialog.user_id, Number(proofDialog.tasks?.reward_amount))}>
-                    <Check className="h-3 w-3 mr-1" /> Approve
+                  <Button size="sm" disabled={pendingIds.has(proofDialog.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(proofDialog.id, "approved", proofDialog.user_id, Number(proofDialog.tasks?.reward_amount))}>
+                    <Check className="h-3 w-3 mr-1" /> {pendingIds.has(proofDialog.id) ? "Processing..." : "Approve"}
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleAction(proofDialog.id, "rejected", proofDialog.user_id, 0)}>
+                  <Button size="sm" disabled={pendingIds.has(proofDialog.id)} variant="destructive" onClick={() => handleAction(proofDialog.id, "rejected", proofDialog.user_id, 0)}>
                     <X className="h-3 w-3 mr-1" /> Reject
                   </Button>
                 </div>
@@ -286,10 +286,11 @@ export default function AdminVerificationsPage() {
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
                     size="sm"
+                    disabled={pendingIds.has(proofDialog.id)}
                     className="bg-primary/10 text-primary hover:bg-primary/20"
                     onClick={() => { handleAllowRetry(proofDialog); setProofDialog(null); }}
                   >
-                    <RotateCcw className="h-3 w-3 mr-1" /> Allow Retry
+                    <RotateCcw className="h-3 w-3 mr-1" /> {pendingIds.has(proofDialog.id) ? "Processing..." : "Allow Retry"}
                   </Button>
                 </div>
               ) : null}
