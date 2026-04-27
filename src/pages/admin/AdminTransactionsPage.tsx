@@ -180,10 +180,16 @@ export default function AdminTransactionsPage() {
           <div><Label>Transaction Hash (optional)</Label><Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Enter tx hash..." className="bg-secondary border-border font-mono text-sm" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTxHashDialog(null)}>Cancel</Button>
-            <Button className="gradient-primary text-primary-foreground" onClick={() => {
-              const tx = transactions.find((t) => t.id === txHashDialog);
-              if (tx) handleApprove(tx.id, tx.user_id, Number(tx.amount));
-            }}>Confirm Approval</Button>
+            <Button
+              className="gradient-primary text-primary-foreground"
+              disabled={!!txHashDialog && pendingIds.has(txHashDialog)}
+              onClick={() => {
+                const tx = transactions.find((t) => t.id === txHashDialog);
+                if (tx) handleApprove(tx.id, tx.user_id, Number(tx.amount));
+              }}
+            >
+              {!!txHashDialog && pendingIds.has(txHashDialog) ? "Processing..." : "Confirm Approval"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
