@@ -176,10 +176,10 @@ export default function AdminUsersPage() {
                       </Button>
                       {status === "pending" && (
                         <>
-                          <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => updateStatus(u.id, u.user_id, "active", u.first_name)}>
-                            <Check className="h-3 w-3 mr-1" /> Approve
+                          <Button size="sm" disabled={pendingIds.has(u.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => updateStatus(u.id, u.user_id, "active", u.first_name)}>
+                            <Check className="h-3 w-3 mr-1" /> {pendingIds.has(u.id) ? "Processing..." : "Approve"}
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={() => updateStatus(u.id, u.user_id, "rejected", u.first_name)}>
+                          <Button size="sm" disabled={pendingIds.has(u.id)} variant="destructive" onClick={() => updateStatus(u.id, u.user_id, "rejected", u.first_name)}>
                             <X className="h-3 w-3 mr-1" /> Reject
                           </Button>
                         </>
