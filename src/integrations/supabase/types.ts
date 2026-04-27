@@ -519,6 +519,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_task_completion: {
+        Args: { _completion_id: string }
+        Returns: Json
+      }
+      approve_user_registration: {
+        Args: { _profile_id: string }
+        Returns: Json
+      }
+      approve_withdrawal: {
+        Args: { _transaction_id: string; _tx_hash: string }
+        Returns: Json
+      }
       generate_referral_code: { Args: never; Returns: string }
       get_user_downlines: {
         Args: { _profile_id: string }
@@ -539,6 +551,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      reject_task_completion: {
+        Args: { _completion_id: string }
+        Returns: Json
+      }
+      reject_user_registration: { Args: { _profile_id: string }; Returns: Json }
+      reject_withdrawal: { Args: { _transaction_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"
