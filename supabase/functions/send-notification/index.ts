@@ -250,62 +250,109 @@ Deno.serve(async (req) => {
       (insertedRows || []).map((r: any) => [r.user_id, r.id])
     );
 
-    // ── Send emails via Resend ────────────────────────────────────────────────
-    let emailsAttempted = 0;
-    let emailsSent = 0;
-    const emailErrors: string[] = [];
-
+    // ── Send emails via Resend (in background to avoid HTTP timeout) ─────────
     if (!RESEND_API_KEY || !LOVABLE_API_KEY) {
-      emailErrors.push(
+      console.error(
         "Resend connector not configured — RESEND_API_KEY and LOVABLE_API_KEY must be set."
       );
-    } else {
-      for (const r of recipients) {
-        emailsAttempted++;
-        const notifId = notifIdMap.get(r.user_id);
-        try {
-          const html = buildEmailHtml({
-            name: r.first_name || "there",
-            title,
-            message,
-            link,
-          });
-          await sendResendEmail({
-            to: r.email,
-            subject: title,
-            html,
-            apiKey: RESEND_API_KEY,
-            lovableApiKey: LOVABLE_API_KEY,
-          });
 
-          if (notifId) {
-            await supabase
-              .from("notifications")
-              .update({ email_sent: true, email_status: "sent" })
-              .eq("id", notifId);
-          }
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          notifications_created: rows.length,
+          emails_attempted: 0,
+          emails_sent: 0,
+          email_errors: ["Resend connector not configured"],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
-          emailsSent++;
-        } catch (e: any) {
-          emailErrors.push(`${r.email}: ${e?.message || String(e)}`);
+    // Process emails in background — don't block the HTTP response.
+    // Resend default rate limit is 2 req/sec. We send in batches of 2,
+    // wait ~1.1s between batches, with retry on 429/5xx inside sendResendEmail.
+    const BATCH_SIZE = 2;
+    const BATCH_DELAY_MS = 1100;
 
-          if (notifId) {
-            await supabase
-              .from("notifications")
-              .update({ email_status: "failed" })
-              .eq("id", notifId);
-          }
+    const sendAll = async () => {
+      let sent = 0;
+      let failed = 0;
+      const successIds: string[] = [];
+      const failedIds: string[] = [];
+
+      for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+        const batch = recipients.slice(i, i + BATCH_SIZE);
+
+        await Promise.all(
+          batch.map(async (r) => {
+            const notifId = notifIdMap.get(r.user_id);
+            try {
+              const html = buildEmailHtml({
+                name: r.first_name || "there",
+                title,
+                message,
+                link,
+              });
+              await sendResendEmail({
+                to: r.email,
+                subject: title,
+                html,
+                apiKey: RESEND_API_KEY,
+                lovableApiKey: LOVABLE_API_KEY,
+              });
+              sent++;
+              if (notifId) successIds.push(notifId);
+            } catch (e: any) {
+              failed++;
+              console.error(`Email failed for ${r.email}:`, e?.message || e);
+              if (notifId) failedIds.push(notifId);
+            }
+          })
+        );
+
+        // Flush DB updates in bulk every batch to keep state fresh
+        if (successIds.length > 0) {
+          await supabase
+            .from("notifications")
+            .update({ email_sent: true, email_status: "sent" })
+            .in("id", successIds.splice(0, successIds.length));
+        }
+        if (failedIds.length > 0) {
+          await supabase
+            .from("notifications")
+            .update({ email_status: "failed" })
+            .in("id", failedIds.splice(0, failedIds.length));
+        }
+
+        // Throttle between batches (skip on last batch)
+        if (i + BATCH_SIZE < recipients.length) {
+          await sleep(BATCH_DELAY_MS);
         }
       }
+
+      console.log(
+        `send-notification done: ${sent} sent, ${failed} failed of ${recipients.length}`
+      );
+    };
+
+    // Use EdgeRuntime.waitUntil so the response returns immediately while
+    // emails continue sending in the background. This prevents HTTP timeouts
+    // on broadcasts to many users.
+    // @ts-ignore - EdgeRuntime is available in Supabase Edge Functions
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(sendAll());
+    } else {
+      // Fallback: fire-and-forget (less reliable)
+      sendAll().catch((e) => console.error("Background send error:", e));
     }
 
     return new Response(
       JSON.stringify({
         ok: true,
         notifications_created: rows.length,
-        emails_attempted: emailsAttempted,
-        emails_sent: emailsSent,
-        email_errors: emailErrors.slice(0, 5),
+        recipients: recipients.length,
+        note: "Emails are being sent in the background.",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
