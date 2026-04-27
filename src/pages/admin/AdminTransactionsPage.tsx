@@ -155,10 +155,10 @@ export default function AdminTransactionsPage() {
                       <span className="font-mono-amount">${Number(tx.amount).toFixed(2)}</span>
                       {tx.status === "pending" && tx.type === "withdrawal" && (
                         <>
-                          <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => setTxHashDialog(tx.id)}>
-                            <Check className="h-3 w-3 mr-1" /> Approve
+                          <Button size="sm" disabled={pendingIds.has(tx.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => setTxHashDialog(tx.id)}>
+                            <Check className="h-3 w-3 mr-1" /> {pendingIds.has(tx.id) ? "Processing..." : "Approve"}
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={() => handleReject(tx.id)}>
+                          <Button size="sm" disabled={pendingIds.has(tx.id)} variant="destructive" onClick={() => handleReject(tx.id)}>
                             <X className="h-3 w-3 mr-1" /> Reject
                           </Button>
                         </>
