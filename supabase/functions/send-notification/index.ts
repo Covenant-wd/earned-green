@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const RESEND_API_URL = "https://api.resend.com/emails";
+const RESEND_API_URL = "https://connector-gateway.lovable.dev/resend/emails";
 
 const FROM_EMAIL =
   Deno.env.get("RESEND_FROM_EMAIL") || "EntreVault <support@entrevault.online>";
@@ -76,12 +76,14 @@ async function sendResendEmail(args: {
   subject: string;
   html: string;
   apiKey: string;
+  lovableApiKey: string;
 }) {
   const res = await fetch(RESEND_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${args.apiKey}`,
+      Authorization: `Bearer ${args.lovableApiKey}`,
+      "X-Connection-Api-Key": args.apiKey,
     },
     body: JSON.stringify({
       from: FROM_EMAIL,
@@ -110,6 +112,7 @@ Deno.serve(async (req) => {
     );
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     const body: NotificationBody = await req.json();
     const { type, title, message, link, metadata, broadcast } = body;
@@ -226,9 +229,9 @@ Deno.serve(async (req) => {
     let emailsSent = 0;
     const emailErrors: string[] = [];
 
-    if (!RESEND_API_KEY) {
+    if (!RESEND_API_KEY || !LOVABLE_API_KEY) {
       emailErrors.push(
-        "Resend not configured — set RESEND_API_KEY in Supabase Edge Function secrets."
+        "Resend connector not configured — RESEND_API_KEY and LOVABLE_API_KEY must be set."
       );
     } else {
       for (const r of recipients) {
@@ -246,6 +249,7 @@ Deno.serve(async (req) => {
             subject: title,
             html,
             apiKey: RESEND_API_KEY,
+            lovableApiKey: LOVABLE_API_KEY,
           });
 
           if (notifId) {
