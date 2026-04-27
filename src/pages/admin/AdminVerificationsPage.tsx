@@ -196,11 +196,12 @@ export default function AdminVerificationsPage() {
                       </Button>
                       <Button
                         size="sm"
+                        disabled={pendingIds.has(comp.id)}
                         className="bg-primary/10 text-primary hover:bg-primary/20"
                         onClick={() => handleAllowRetry(comp)}
                         title="Clears the rejection so the user can submit this task again"
                       >
-                        <RotateCcw className="h-3 w-3 mr-1" /> Allow Retry
+                        <RotateCcw className="h-3 w-3 mr-1" /> {pendingIds.has(comp.id) ? "Processing..." : "Allow Retry"}
                       </Button>
                     </div>
                   </div>
