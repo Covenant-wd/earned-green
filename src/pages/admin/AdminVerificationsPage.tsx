@@ -19,6 +19,7 @@ export default function AdminVerificationsPage() {
   const [pending, setPending] = useState<any[]>([]);
   const [rejected, setRejected] = useState<any[]>([]);
   const [proofDialog, setProofDialog] = useState<any>(null);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   const enrichWithProfiles = async (rows: any[]) => {
     if (!rows || rows.length === 0) return [];
@@ -43,52 +44,89 @@ export default function AdminVerificationsPage() {
   useEffect(() => { load(); }, []);
 
   const handleAction = async (id: string, status: string, userId: string, rewardAmount: number) => {
-    const completion = pending.find((c) => c.id === id);
-    const taskTitle = completion?.tasks?.title || "your task submission";
+    // Guard against rapid double-clicks
+    if (pendingIds.has(id)) return;
+    setPendingIds((s) => new Set(s).add(id));
 
-    const { error } = await supabase.from("task_completions").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
-    if (error) { toast.error(error.message); return; }
+    try {
+      const completion = pending.find((c) => c.id === id);
+      const taskTitle = completion?.tasks?.title || "your task submission";
 
-    if (status === "approved") {
-      const { data: profile } = await supabase.from("profiles").select("usdt_balance").eq("user_id", userId).single();
-      if (profile) {
-        await supabase.from("profiles").update({ usdt_balance: Number(profile.usdt_balance) + rewardAmount }).eq("user_id", userId);
-        await supabase.from("transactions").insert({ user_id: userId, amount: rewardAmount, type: "reward", status: "completed" });
+      if (status === "approved") {
+        // Atomic, idempotent: credits the reward exactly once
+        const { data, error } = await supabase.rpc("approve_task_completion", { _completion_id: id });
+        if (error) { toast.error(error.message); return; }
+
+        const result = data as any;
+        if (result?.status === "already_processed") {
+          toast.info("This submission was already processed");
+          setProofDialog(null);
+          await load();
+          return;
+        }
+
+        await sendNotification({
+          userId,
+          type: "task_approved",
+          title: "Task approved ✅",
+          message: `Your submission for "${taskTitle}" was approved. $${rewardAmount.toFixed(2)} USDT has been credited to your wallet.`,
+          link: "/wallet",
+        });
+        toast.success("Task approved, reward credited");
+      } else {
+        const { data, error } = await supabase.rpc("reject_task_completion", { _completion_id: id });
+        if (error) { toast.error(error.message); return; }
+
+        const result = data as any;
+        if (result?.status === "already_processed") {
+          toast.info("This submission was already processed");
+          setProofDialog(null);
+          await load();
+          return;
+        }
+
+        await sendNotification({
+          userId,
+          type: "task_rejected",
+          title: "Task submission rejected",
+          message: `Your submission for "${taskTitle}" was not approved. Please review the requirements and try again.`,
+          link: "/tasks",
+        });
+        toast.error("Task rejected");
       }
-      await sendNotification({
-        userId,
-        type: "task_approved",
-        title: "Task approved ✅",
-        message: `Your submission for "${taskTitle}" was approved. $${rewardAmount.toFixed(2)} USDT has been credited to your wallet.`,
-        link: "/wallet",
+      setProofDialog(null);
+      await load();
+    } finally {
+      setPendingIds((s) => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
       });
-      toast.success("Task approved, reward credited");
-    } else {
-      await sendNotification({
-        userId,
-        type: "task_rejected",
-        title: "Task submission rejected",
-        message: `Your submission for "${taskTitle}" was not approved. Please review the requirements and try again.`,
-        link: "/tasks",
-      });
-      toast.error("Task rejected");
     }
-    setProofDialog(null);
-    load();
   };
 
   const handleAllowRetry = async (comp: any) => {
-    const { error } = await supabase.from("task_completions").delete().eq("id", comp.id);
-    if (error) { toast.error(error.message); return; }
-    await sendNotification({
-      userId: comp.user_id,
-      type: "task_retry_allowed",
-      title: "You can retry a task 🔄",
-      message: `An admin has allowed you to resubmit "${comp.tasks?.title}". Head to the Tasks page to try again.`,
-      link: "/tasks",
-    });
-    toast.success("Retry allowed — user can resubmit");
-    load();
+    if (pendingIds.has(comp.id)) return;
+    setPendingIds((s) => new Set(s).add(comp.id));
+    try {
+      const { error } = await supabase.from("task_completions").delete().eq("id", comp.id);
+      if (error) { toast.error(error.message); return; }
+      await sendNotification({
+        userId: comp.user_id,
+        type: "task_retry_allowed",
+        title: "You can retry a task 🔄",
+        message: `An admin has allowed you to resubmit "${comp.tasks?.title}". Head to the Tasks page to try again.`,
+        link: "/tasks",
+      });
+      toast.success("Retry allowed — user can resubmit");
+      await load();
+    } finally {
+      setPendingIds((s) => {
+        const next = new Set(s);
+        next.delete(comp.id);
+        return next;
+      });
+    }
   };
 
   return (
@@ -125,10 +163,10 @@ export default function AdminVerificationsPage() {
                       <Button size="sm" variant="outline" onClick={() => setProofDialog(comp)}>
                         <Eye className="h-3 w-3 mr-1" /> View Proof
                       </Button>
-                      <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(comp.id, "approved", comp.user_id, Number(comp.tasks?.reward_amount))}>
-                        <Check className="h-3 w-3 mr-1" /> Approve
+                      <Button size="sm" disabled={pendingIds.has(comp.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(comp.id, "approved", comp.user_id, Number(comp.tasks?.reward_amount))}>
+                        <Check className="h-3 w-3 mr-1" /> {pendingIds.has(comp.id) ? "Processing..." : "Approve"}
                       </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleAction(comp.id, "rejected", comp.user_id, 0)}>
+                      <Button size="sm" disabled={pendingIds.has(comp.id)} variant="destructive" onClick={() => handleAction(comp.id, "rejected", comp.user_id, 0)}>
                         <X className="h-3 w-3 mr-1" /> Reject
                       </Button>
                     </div>
@@ -158,11 +196,12 @@ export default function AdminVerificationsPage() {
                       </Button>
                       <Button
                         size="sm"
+                        disabled={pendingIds.has(comp.id)}
                         className="bg-primary/10 text-primary hover:bg-primary/20"
                         onClick={() => handleAllowRetry(comp)}
                         title="Clears the rejection so the user can submit this task again"
                       >
-                        <RotateCcw className="h-3 w-3 mr-1" /> Allow Retry
+                        <RotateCcw className="h-3 w-3 mr-1" /> {pendingIds.has(comp.id) ? "Processing..." : "Allow Retry"}
                       </Button>
                     </div>
                   </div>
@@ -236,10 +275,10 @@ export default function AdminVerificationsPage() {
 
               {proofDialog.status === "pending" ? (
                 <div className="flex justify-end gap-2 pt-2">
-                  <Button size="sm" className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(proofDialog.id, "approved", proofDialog.user_id, Number(proofDialog.tasks?.reward_amount))}>
-                    <Check className="h-3 w-3 mr-1" /> Approve
+                  <Button size="sm" disabled={pendingIds.has(proofDialog.id)} className="bg-success/10 text-success hover:bg-success/20" onClick={() => handleAction(proofDialog.id, "approved", proofDialog.user_id, Number(proofDialog.tasks?.reward_amount))}>
+                    <Check className="h-3 w-3 mr-1" /> {pendingIds.has(proofDialog.id) ? "Processing..." : "Approve"}
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleAction(proofDialog.id, "rejected", proofDialog.user_id, 0)}>
+                  <Button size="sm" disabled={pendingIds.has(proofDialog.id)} variant="destructive" onClick={() => handleAction(proofDialog.id, "rejected", proofDialog.user_id, 0)}>
                     <X className="h-3 w-3 mr-1" /> Reject
                   </Button>
                 </div>
@@ -247,10 +286,11 @@ export default function AdminVerificationsPage() {
                 <div className="flex justify-end gap-2 pt-2">
                   <Button
                     size="sm"
+                    disabled={pendingIds.has(proofDialog.id)}
                     className="bg-primary/10 text-primary hover:bg-primary/20"
                     onClick={() => { handleAllowRetry(proofDialog); setProofDialog(null); }}
                   >
-                    <RotateCcw className="h-3 w-3 mr-1" /> Allow Retry
+                    <RotateCcw className="h-3 w-3 mr-1" /> {pendingIds.has(proofDialog.id) ? "Processing..." : "Allow Retry"}
                   </Button>
                 </div>
               ) : null}
