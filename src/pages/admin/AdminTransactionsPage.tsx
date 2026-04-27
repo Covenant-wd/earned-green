@@ -16,6 +16,7 @@ export default function AdminTransactionsPage() {
   const [search, setSearch] = useState("");
   const [txHashDialog, setTxHashDialog] = useState<string | null>(null);
   const [txHash, setTxHash] = useState("");
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   const load = async () => {
     // Fetch transactions first
@@ -46,39 +47,80 @@ export default function AdminTransactionsPage() {
     });
 
   const handleApprove = async (id: string, userId: string, amount: number) => {
-    const { error } = await supabase.from("transactions").update({ status: "completed", tx_hash: txHash || null }).eq("id", id);
-    if (error) { toast.error(error.message); return; }
-    const { data: profile } = await supabase.from("profiles").select("usdt_balance").eq("user_id", userId).single();
-    if (profile) {
-      await supabase.from("profiles").update({ usdt_balance: Math.max(0, Number(profile.usdt_balance) - amount) }).eq("user_id", userId);
+    if (pendingIds.has(id)) return;
+    setPendingIds((s) => new Set(s).add(id));
+
+    try {
+      // Atomic, idempotent: debits balance exactly once even on double-click
+      const { data, error } = await supabase.rpc("approve_withdrawal", {
+        _transaction_id: id,
+        _tx_hash: txHash || "",
+      });
+      if (error) { toast.error(error.message); return; }
+
+      const result = data as any;
+      if (result?.status === "already_processed") {
+        toast.info("This withdrawal was already processed");
+        setTxHashDialog(null);
+        setTxHash("");
+        await load();
+        return;
+      }
+
+      await sendNotification({
+        userId,
+        type: "withdrawal_approved",
+        title: "Withdrawal processed 💸",
+        message: `Your withdrawal of $${amount.toFixed(2)} USDT has been processed${txHash ? `. Transaction hash: ${txHash}` : "."}`,
+        link: "/wallet",
+      });
+      toast.success("Transaction approved");
+      setTxHashDialog(null);
+      setTxHash("");
+      await load();
+    } finally {
+      setPendingIds((s) => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
+      });
     }
-    await sendNotification({
-      userId,
-      type: "withdrawal_approved",
-      title: "Withdrawal processed 💸",
-      message: `Your withdrawal of $${amount.toFixed(2)} USDT has been processed${txHash ? `. Transaction hash: ${txHash}` : "."}`,
-      link: "/wallet",
-    });
-    toast.success("Transaction approved");
-    setTxHashDialog(null);
-    setTxHash("");
-    load();
   };
 
   const handleReject = async (id: string) => {
-    const tx = transactions.find((t) => t.id === id);
-    await supabase.from("transactions").update({ status: "rejected" }).eq("id", id);
-    if (tx) {
-      await sendNotification({
-        userId: tx.user_id,
-        type: "withdrawal_rejected",
-        title: "Withdrawal rejected",
-        message: `Your withdrawal request of $${Number(tx.amount).toFixed(2)} USDT was rejected. The amount remains in your wallet balance.`,
-        link: "/wallet",
+    if (pendingIds.has(id)) return;
+    setPendingIds((s) => new Set(s).add(id));
+
+    try {
+      const tx = transactions.find((t) => t.id === id);
+      const { data, error } = await supabase.rpc("reject_withdrawal", { _transaction_id: id });
+      if (error) { toast.error(error.message); return; }
+
+      const result = data as any;
+      if (result?.status === "already_processed") {
+        toast.info("This withdrawal was already processed");
+        await load();
+        return;
+      }
+
+      if (tx) {
+        await sendNotification({
+          userId: tx.user_id,
+          type: "withdrawal_rejected",
+          title: "Withdrawal rejected",
+          message: `Your withdrawal request of $${Number(tx.amount).toFixed(2)} USDT was rejected. The amount remains in your wallet balance.`,
+          link: "/wallet",
+        });
+      }
+      toast.error("Transaction rejected");
+      await load();
+    } finally {
+      setPendingIds((s) => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
       });
     }
-    toast.error("Transaction rejected");
-    load();
   };
 
   return (
