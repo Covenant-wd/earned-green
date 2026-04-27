@@ -77,28 +77,54 @@ async function sendResendEmail(args: {
   html: string;
   apiKey: string;
   lovableApiKey: string;
-}) {
-  const res = await fetch(RESEND_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${args.lovableApiKey}`,
-      "X-Connection-Api-Key": args.apiKey,
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to: [args.to],
-      subject: args.subject,
-      html: args.html,
-    }),
-  });
+  maxRetries?: number;
+}): Promise<any> {
+  const maxRetries = args.maxRetries ?? 3;
+  let attempt = 0;
+  let lastError: any = null;
 
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
+  while (attempt <= maxRetries) {
+    const res = await fetch(RESEND_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${args.lovableApiKey}`,
+        "X-Connection-Api-Key": args.apiKey,
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [args.to],
+        subject: args.subject,
+        html: args.html,
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok) return data;
+
+    // Retry on 429 (rate limit) and 5xx with exponential backoff
+    if ((res.status === 429 || res.status >= 500) && attempt < maxRetries) {
+      const retryAfter = parseInt(res.headers.get("retry-after") || "0", 10);
+      const backoffMs = retryAfter > 0
+        ? retryAfter * 1000
+        : Math.min(1000 * Math.pow(2, attempt), 8000);
+      console.log(
+        `Resend ${res.status} for ${args.to}, retrying in ${backoffMs}ms (attempt ${attempt + 1}/${maxRetries})`
+      );
+      await new Promise((r) => setTimeout(r, backoffMs));
+      attempt++;
+      lastError = new Error(`Resend ${res.status}: ${JSON.stringify(data)}`);
+      continue;
+    }
+
     throw new Error(`Resend error ${res.status}: ${JSON.stringify(data)}`);
   }
-  return data;
+
+  throw lastError || new Error("Resend failed after retries");
 }
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
