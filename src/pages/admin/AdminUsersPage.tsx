@@ -19,6 +19,7 @@ export default function AdminUsersPage() {
   const [proofImage, setProofImage] = useState<string | null>(null);
   const [editUser, setEditUser] = useState<any>(null);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const [editForm, setEditForm] = useState({ first_name: "", last_name: "", email: "", country: "", state: "", address: "", wallet_address: "", usdt_balance: "", registration_status: "" });
 
   const loadUsers = async () => {
@@ -32,46 +33,61 @@ export default function AdminUsersPage() {
     users.filter((u) => u.registration_status === status)
       .filter((u) => `${u.first_name} ${u.last_name} ${u.email}`.toLowerCase().includes(search.toLowerCase()));
 
-  const updateStatus = async (userId: string, userAuthId: string, status: string, name: string) => {
-    const { error } = await supabase.from("profiles").update({ registration_status: status }).eq("user_id", userAuthId);
-    if (error) { toast.error(error.message); return; }
+  const updateStatus = async (profileId: string, userAuthId: string, status: string, name: string) => {
+    // Guard: prevent rapid double-clicks from triggering duplicate requests
+    if (pendingIds.has(profileId)) return;
+    setPendingIds((s) => new Set(s).add(profileId));
 
-    // Credit referral bonus when approving a user
-    if (status === "active") {
-      const { data: approvedProfile } = await supabase.from("profiles").select("referred_by_id").eq("user_id", userAuthId).single();
-      if (approvedProfile?.referred_by_id) {
-        const { data: settings } = await supabase.from("admin_settings").select("registration_fee, referral_bonus_percent").limit(1).single();
-        if (settings) {
-          const bonus = (Number(settings.registration_fee) * Number(settings.referral_bonus_percent)) / 100;
-          const { data: referrer } = await supabase.from("profiles").select("usdt_balance, user_id").eq("id", approvedProfile.referred_by_id).single();
-          if (referrer) {
-            await supabase.from("profiles").update({ usdt_balance: Number(referrer.usdt_balance) + bonus }).eq("id", approvedProfile.referred_by_id);
-            await supabase.from("transactions").insert({ user_id: referrer.user_id, amount: bonus, type: "referral_bonus", status: "completed" });
-          }
+    try {
+      if (status === "active") {
+        // Atomic, idempotent: credits referral bonus exactly once even on
+        // double-click or concurrent calls.
+        const { data, error } = await supabase.rpc("approve_user_registration", { _profile_id: profileId });
+        if (error) { toast.error(error.message); return; }
+
+        const result = data as any;
+        if (result?.status === "already_approved") {
+          toast.info(`${name} was already approved`);
+          await loadUsers();
+          return;
         }
+
+        await sendNotification({
+          userId: userAuthId,
+          type: "account_approved",
+          title: "Your account has been approved 🎉",
+          message: `Hi ${name || "there"}, your EntreVault account is now active. You can start completing tasks and earning USDT right away!`,
+          link: "/dashboard",
+        });
+        toast.success(`${name} approved`);
+      } else if (status === "rejected") {
+        const { data, error } = await supabase.rpc("reject_user_registration", { _profile_id: profileId });
+        if (error) { toast.error(error.message); return; }
+
+        const result = data as any;
+        if (result?.status === "already_processed") {
+          toast.info(`${name} was already processed`);
+          await loadUsers();
+          return;
+        }
+
+        await sendNotification({
+          userId: userAuthId,
+          type: "account_rejected",
+          title: "Account registration update",
+          message: `Hi ${name || "there"}, unfortunately your registration could not be approved at this time. Please contact support if you believe this is an error.`,
+        });
+        toast.success(`${name} rejected`);
       }
-    }
 
-    // Send notification + email
-    if (status === "active") {
-      await sendNotification({
-        userId: userAuthId,
-        type: "account_approved",
-        title: "Your account has been approved 🎉",
-        message: `Hi ${name || "there"}, your EntreVault account is now active. You can start completing tasks and earning USDT right away!`,
-        link: "/dashboard",
-      });
-    } else if (status === "rejected") {
-      await sendNotification({
-        userId: userAuthId,
-        type: "account_rejected",
-        title: "Account registration update",
-        message: `Hi ${name || "there"}, unfortunately your registration could not be approved at this time. Please contact support if you believe this is an error.`,
+      await loadUsers();
+    } finally {
+      setPendingIds((s) => {
+        const next = new Set(s);
+        next.delete(profileId);
+        return next;
       });
     }
-
-    toast.success(`${name} ${status === "active" ? "approved" : "rejected"}`);
-    loadUsers();
   };
 
   const openEdit = (u: any) => {
