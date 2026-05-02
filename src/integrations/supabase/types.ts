@@ -17,27 +17,36 @@ export type Database = {
       admin_settings: {
         Row: {
           admin_wallet_address: string | null
+          flutterwave_enabled: boolean
           id: string
           minipay_number: string | null
           payment_instructions: string | null
           referral_bonus_percent: number
           registration_fee: number
+          usdt_to_kes_rate: number
+          usdt_to_ngn_rate: number
         }
         Insert: {
           admin_wallet_address?: string | null
+          flutterwave_enabled?: boolean
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
           referral_bonus_percent?: number
           registration_fee?: number
+          usdt_to_kes_rate?: number
+          usdt_to_ngn_rate?: number
         }
         Update: {
           admin_wallet_address?: string | null
+          flutterwave_enabled?: boolean
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
           referral_bonus_percent?: number
           registration_fee?: number
+          usdt_to_kes_rate?: number
+          usdt_to_ngn_rate?: number
         }
         Relationships: []
       }
@@ -260,6 +269,60 @@ export type Database = {
           read?: boolean
           title?: string
           type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_intents: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          exchange_rate: number
+          fiat_amount: number
+          fiat_currency: string
+          flw_tx_id: string | null
+          id: string
+          metadata: Json
+          payment_link: string | null
+          purpose: string
+          status: string
+          tx_ref: string
+          updated_at: string
+          usdt_amount: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          exchange_rate: number
+          fiat_amount: number
+          fiat_currency: string
+          flw_tx_id?: string | null
+          id?: string
+          metadata?: Json
+          payment_link?: string | null
+          purpose: string
+          status?: string
+          tx_ref: string
+          updated_at?: string
+          usdt_amount: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          exchange_rate?: number
+          fiat_amount?: number
+          fiat_currency?: string
+          flw_tx_id?: string | null
+          id?: string
+          metadata?: Json
+          payment_link?: string | null
+          purpose?: string
+          status?: string
+          tx_ref?: string
+          updated_at?: string
+          usdt_amount?: number
           user_id?: string
         }
         Relationships: []
