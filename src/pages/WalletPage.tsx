@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Wallet, Copy, ArrowDownToLine, Check } from "lucide-react";
+import { Wallet, Copy, ArrowDownToLine, Check, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { FlutterwavePayment } from "@/components/FlutterwavePayment";
 import { toast } from "sonner";
 
 export default function WalletPage() {
   const { user, profile } = useAuth();
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [minipayNumber, setMinipayNumber] = useState("");
   const [copied, setCopied] = useState(false);
@@ -66,9 +68,14 @@ export default function WalletPage() {
               <span className="text-muted-foreground">USDT Balance</span>
             </div>
             <p className="text-4xl font-mono-amount glow-text mb-4">${Number(profile.usdt_balance).toFixed(2)}</p>
-            <Button className="gradient-primary text-primary-foreground" onClick={() => setWithdrawOpen(true)}>
-              <ArrowDownToLine className="h-4 w-4 mr-2" /> Withdraw
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button className="gradient-primary text-primary-foreground" onClick={() => setDepositOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Deposit
+              </Button>
+              <Button variant="outline" onClick={() => setWithdrawOpen(true)}>
+                <ArrowDownToLine className="h-4 w-4 mr-2" /> Withdraw
+              </Button>
+            </div>
           </div>
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold mb-3">Referral Link</h3>
@@ -123,6 +130,18 @@ export default function WalletPage() {
             <Button variant="outline" onClick={() => setWithdrawOpen(false)}>Cancel</Button>
             <Button className="gradient-primary text-primary-foreground" onClick={handleWithdraw}>Request Withdrawal</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+        <DialogContent className="glass-card border-border">
+          <DialogHeader><DialogTitle className="font-display">Deposit USDT</DialogTitle></DialogHeader>
+          <div className="py-2">
+            <p className="text-xs text-muted-foreground mb-4">
+              Pay with your local card or bank in NGN/KES via Flutterwave. Your USDT balance will be credited automatically once payment confirms.
+            </p>
+            <FlutterwavePayment purpose="deposit" />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
