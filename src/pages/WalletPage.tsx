@@ -132,6 +132,18 @@ export default function WalletPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+        <DialogContent className="glass-card border-border">
+          <DialogHeader><DialogTitle className="font-display">Deposit USDT</DialogTitle></DialogHeader>
+          <div className="py-2">
+            <p className="text-xs text-muted-foreground mb-4">
+              Pay with your local card or bank in NGN/KES via Flutterwave. Your USDT balance will be credited automatically once payment confirms.
+            </p>
+            <FlutterwavePayment purpose="deposit" />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
