@@ -14,6 +14,7 @@ import { toast } from "sonner";
 export default function WalletPage() {
   const { user, profile } = useAuth();
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [minipayNumber, setMinipayNumber] = useState("");
   const [copied, setCopied] = useState(false);
@@ -67,9 +68,14 @@ export default function WalletPage() {
               <span className="text-muted-foreground">USDT Balance</span>
             </div>
             <p className="text-4xl font-mono-amount glow-text mb-4">${Number(profile.usdt_balance).toFixed(2)}</p>
-            <Button className="gradient-primary text-primary-foreground" onClick={() => setWithdrawOpen(true)}>
-              <ArrowDownToLine className="h-4 w-4 mr-2" /> Withdraw
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button className="gradient-primary text-primary-foreground" onClick={() => setDepositOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Deposit
+              </Button>
+              <Button variant="outline" onClick={() => setWithdrawOpen(true)}>
+                <ArrowDownToLine className="h-4 w-4 mr-2" /> Withdraw
+              </Button>
+            </div>
           </div>
           <div className="glass-card p-6">
             <h3 className="font-display font-semibold mb-3">Referral Link</h3>
