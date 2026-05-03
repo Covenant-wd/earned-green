@@ -27,7 +27,10 @@ export default function AdminSettingsPage() {
       admin_wallet_address: settings.admin_wallet_address,
       minipay_number: settings.minipay_number,
       payment_instructions: settings.payment_instructions,
-    }).eq("id", settings.id);
+      usdt_to_ngn_rate: settings.usdt_to_ngn_rate,
+      usdt_to_kes_rate: settings.usdt_to_kes_rate,
+      flutterwave_enabled: settings.flutterwave_enabled,
+    } as any).eq("id", settings.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
   };
@@ -44,6 +47,28 @@ export default function AdminSettingsPage() {
           <div><Label>Admin Wallet Address (TRC20)</Label><Input value={settings.admin_wallet_address || ""} onChange={(e) => setSettings({ ...settings, admin_wallet_address: e.target.value })} className="bg-secondary border-border font-mono text-sm" /></div>
           <div><Label>MiniPay Number</Label><Input value={settings.minipay_number || ""} onChange={(e) => setSettings({ ...settings, minipay_number: e.target.value })} className="bg-secondary border-border font-mono" /></div>
           <div><Label>Payment Instructions</Label><Textarea value={settings.payment_instructions || ""} onChange={(e) => setSettings({ ...settings, payment_instructions: e.target.value })} className="bg-secondary border-border" rows={4} /></div>
+
+          <div className="border-t border-border pt-5 space-y-5">
+            <h3 className="font-display font-semibold">Flutterwave Payments (NGN / KES)</h3>
+            <div className="flex items-center gap-3">
+              <input
+                id="flw-enabled"
+                type="checkbox"
+                checked={!!settings.flutterwave_enabled}
+                onChange={(e) => setSettings({ ...settings, flutterwave_enabled: e.target.checked })}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="flw-enabled" className="cursor-pointer">Enable Flutterwave checkout for registration & deposits</Label>
+            </div>
+            <div><Label>USDT → NGN rate (1 USDT = ₦?)</Label><Input type="number" value={settings.usdt_to_ngn_rate ?? 1600} onChange={(e) => setSettings({ ...settings, usdt_to_ngn_rate: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
+            <div><Label>USDT → KES rate (1 USDT = KSh?)</Label><Input type="number" value={settings.usdt_to_kes_rate ?? 130} onChange={(e) => setSettings({ ...settings, usdt_to_kes_rate: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
+            <p className="text-xs text-muted-foreground">
+              Webhook URL (set this in your Flutterwave dashboard):
+              <br />
+              <span className="font-mono break-all text-foreground">https://ljhpnkleqfgudfqkebog.supabase.co/functions/v1/flutterwave-webhook</span>
+            </p>
+          </div>
+
           <Button className="gradient-primary text-primary-foreground" onClick={handleSave}><Save className="h-4 w-4 mr-2" /> Save Settings</Button>
         </div>
       </motion.div>
