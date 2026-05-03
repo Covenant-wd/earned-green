@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { DollarSign, Users, ListChecks, Clock, AlertTriangle, Upload, UserCheck, UserX } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
+import { FlutterwavePayment } from "@/components/FlutterwavePayment";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -108,15 +109,24 @@ export default function DashboardPage() {
             {profile.payment_proof_url ? (
               <div className="text-sm text-success">✓ Payment proof uploaded. Awaiting admin review.</div>
             ) : (
-              <label>
-                <Button className="w-full gradient-primary text-primary-foreground" disabled={uploading} asChild>
-                  <span>
-                    <Upload className="h-4 w-4 mr-2" />
-                    {uploading ? "Uploading..." : "Upload Payment Proof"}
-                  </span>
-                </Button>
-                <input type="file" accept="image/*" className="hidden" onChange={handleUploadProof} />
-              </label>
+              <>
+                {settings?.flutterwave_enabled && (
+                  <div className="mb-4 p-4 rounded-lg border border-border">
+                    <h4 className="font-semibold text-sm mb-3 text-left">Pay instantly with Flutterwave</h4>
+                    <FlutterwavePayment purpose="registration" fixedUsdtAmount={Number(settings.registration_fee)} />
+                    <p className="text-xs text-muted-foreground text-center mt-3">— or upload proof of crypto payment —</p>
+                  </div>
+                )}
+                <label>
+                  <Button className="w-full gradient-primary text-primary-foreground" disabled={uploading} asChild>
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      {uploading ? "Uploading..." : "Upload Payment Proof"}
+                    </span>
+                  </Button>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleUploadProof} />
+                </label>
+              </>
             )}
           </div>
         </motion.div>
