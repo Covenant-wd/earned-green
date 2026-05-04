@@ -232,15 +232,6 @@ export default function HomePage() {
 
         .scroll-hint { animation: scrollBounce 1.8s ease-in-out infinite; }
 
-        .stat-number {
-          font-family: 'JetBrains Mono', monospace;
-          font-weight: 600;
-          font-size: 2.6rem;
-          color: hsl(160 84% 45%);
-          text-shadow: 0 0 20px hsl(160 84% 39% / 0.4);
-          line-height: 1;
-        }
-
         .step-number {
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.75rem;
