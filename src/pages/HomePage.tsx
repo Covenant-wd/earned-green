@@ -268,7 +268,7 @@ export default function HomePage() {
           .features-grid { grid-template-columns: 1fr !important; }
           .steps-grid { grid-template-columns: 1fr !important; }
           .testimonials-grid { grid-template-columns: 1fr !important; }
-          .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+          
           .hero-btns { flex-direction: column !important; align-items: stretch !important; }
           .hero-btns button { justify-content: center !important; }
           .nav-links { display: none !important; }
