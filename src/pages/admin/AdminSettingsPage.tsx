@@ -30,6 +30,7 @@ export default function AdminSettingsPage() {
       usdt_to_ngn_rate: settings.usdt_to_ngn_rate,
       usdt_to_kes_rate: settings.usdt_to_kes_rate,
       flutterwave_enabled: settings.flutterwave_enabled,
+      payment_methods: settings.payment_methods,
     } as any).eq("id", settings.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
