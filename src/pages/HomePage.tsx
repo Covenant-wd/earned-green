@@ -407,31 +407,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
-      <section ref={statsRef} style={{ padding: "5rem 2rem" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <div className="glass" style={{ padding: "3rem 2rem" }}>
-            <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0", textAlign: "center" }}>
-              {[
-                { val: users, suffix: "+", label: "Active earners" },
-                { val: paid, suffix: "+", label: "USDT paid out", prefix: "$" },
-                { val: tasks, suffix: "+", label: "Tasks completed daily" },
-              ].map((s, i) => (
-                <div key={i} style={{
-                  padding: "1.5rem 1rem",
-                  borderRight: i < 2 ? "1px solid hsla(220, 16%, 25%, 0.3)" : "none",
-                }}>
-                  <div className="stat-number">
-                    {s.prefix || ""}{s.val.toLocaleString()}{s.suffix}
-                  </div>
-                  <div style={{ color: "hsl(220 10% 55%)", fontSize: "0.85rem", marginTop: "8px", fontWeight: 500 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── HOW IT WORKS ── */}
       <section id="how-it-works" style={{ padding: "5rem 2rem" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
