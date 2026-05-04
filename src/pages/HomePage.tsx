@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Vault,
@@ -15,25 +15,6 @@ import {
   Globe,
   Lock,
 } from "lucide-react";
-
-/* ─── tiny hook: animate numbers counting up ─── */
-function useCountUp(target: number, duration = 1800, start = false) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let raf: number;
-    const t0 = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - t0) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(ease * target));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [start, target, duration]);
-  return val;
-}
 
 /* ─── step data ─── */
 const steps = [
@@ -119,22 +100,6 @@ const testimonials = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const statsRef = useRef<HTMLDivElement>(null);
-  const [statsVisible, setStatsVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setStatsVisible(true); },
-      { threshold: 0.3 }
-    );
-    if (statsRef.current) obs.observe(statsRef.current);
-    return () => obs.disconnect();
-  }, []);
-
-  const users = useCountUp(12400, 2000, statsVisible);
-  const paid = useCountUp(98600, 2200, statsVisible);
-  const tasks = useCountUp(340, 1600, statsVisible);
-
   return (
     <div
       style={{
@@ -267,15 +232,6 @@ export default function HomePage() {
 
         .scroll-hint { animation: scrollBounce 1.8s ease-in-out infinite; }
 
-        .stat-number {
-          font-family: 'JetBrains Mono', monospace;
-          font-weight: 600;
-          font-size: 2.6rem;
-          color: hsl(160 84% 45%);
-          text-shadow: 0 0 20px hsl(160 84% 39% / 0.4);
-          line-height: 1;
-        }
-
         .step-number {
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.75rem;
@@ -308,11 +264,11 @@ export default function HomePage() {
         @media (max-width: 768px) {
           .hero-title { font-size: 2.6rem !important; }
           .hero-subtitle { font-size: 1rem !important; }
-          .stat-number { font-size: 2rem !important; }
+          
           .features-grid { grid-template-columns: 1fr !important; }
           .steps-grid { grid-template-columns: 1fr !important; }
           .testimonials-grid { grid-template-columns: 1fr !important; }
-          .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+          
           .hero-btns { flex-direction: column !important; align-items: stretch !important; }
           .hero-btns button { justify-content: center !important; }
           .nav-links { display: none !important; }
@@ -439,31 +395,6 @@ export default function HomePage() {
         {/* Scroll hint */}
         <div className="scroll-hint" style={{ position: "absolute", bottom: "2rem", left: "50%", transform: "translateX(-50%)", color: "hsl(220 10% 40%)" }}>
           <ChevronDown size={22} />
-        </div>
-      </section>
-
-      {/* ── STATS ── */}
-      <section ref={statsRef} style={{ padding: "5rem 2rem" }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <div className="glass" style={{ padding: "3rem 2rem" }}>
-            <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0", textAlign: "center" }}>
-              {[
-                { val: users, suffix: "+", label: "Active earners" },
-                { val: paid, suffix: "+", label: "USDT paid out", prefix: "$" },
-                { val: tasks, suffix: "+", label: "Tasks completed daily" },
-              ].map((s, i) => (
-                <div key={i} style={{
-                  padding: "1.5rem 1rem",
-                  borderRight: i < 2 ? "1px solid hsla(220, 16%, 25%, 0.3)" : "none",
-                }}>
-                  <div className="stat-number">
-                    {s.prefix || ""}{s.val.toLocaleString()}{s.suffix}
-                  </div>
-                  <div style={{ color: "hsl(220 10% 55%)", fontSize: "0.85rem", marginTop: "8px", fontWeight: 500 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
