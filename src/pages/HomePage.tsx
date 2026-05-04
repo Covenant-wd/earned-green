@@ -264,7 +264,7 @@ export default function HomePage() {
         @media (max-width: 768px) {
           .hero-title { font-size: 2.6rem !important; }
           .hero-subtitle { font-size: 1rem !important; }
-          .stat-number { font-size: 2rem !important; }
+          
           .features-grid { grid-template-columns: 1fr !important; }
           .steps-grid { grid-template-columns: 1fr !important; }
           .testimonials-grid { grid-template-columns: 1fr !important; }
