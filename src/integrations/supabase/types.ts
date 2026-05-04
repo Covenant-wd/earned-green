@@ -21,6 +21,7 @@ export type Database = {
           id: string
           minipay_number: string | null
           payment_instructions: string | null
+          payment_methods: string
           referral_bonus_percent: number
           registration_fee: number
           usdt_to_kes_rate: number
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
+          payment_methods?: string
           referral_bonus_percent?: number
           registration_fee?: number
           usdt_to_kes_rate?: number
@@ -43,6 +45,7 @@ export type Database = {
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
+          payment_methods?: string
           referral_bonus_percent?: number
           registration_fee?: number
           usdt_to_kes_rate?: number
