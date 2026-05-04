@@ -30,6 +30,7 @@ export default function AdminSettingsPage() {
       usdt_to_ngn_rate: settings.usdt_to_ngn_rate,
       usdt_to_kes_rate: settings.usdt_to_kes_rate,
       flutterwave_enabled: settings.flutterwave_enabled,
+      payment_methods: settings.payment_methods,
     } as any).eq("id", settings.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
@@ -47,6 +48,30 @@ export default function AdminSettingsPage() {
           <div><Label>Admin Wallet Address (TRC20)</Label><Input value={settings.admin_wallet_address || ""} onChange={(e) => setSettings({ ...settings, admin_wallet_address: e.target.value })} className="bg-secondary border-border font-mono text-sm" /></div>
           <div><Label>MiniPay Number</Label><Input value={settings.minipay_number || ""} onChange={(e) => setSettings({ ...settings, minipay_number: e.target.value })} className="bg-secondary border-border font-mono" /></div>
           <div><Label>Payment Instructions</Label><Textarea value={settings.payment_instructions || ""} onChange={(e) => setSettings({ ...settings, payment_instructions: e.target.value })} className="bg-secondary border-border" rows={4} /></div>
+
+          <div className="border-t border-border pt-5 space-y-3">
+            <Label>Available Payment Methods</Label>
+            <p className="text-xs text-muted-foreground">Choose which payment options users see during registration and deposits.</p>
+            <div className="space-y-2">
+              {[
+                { value: "both", label: "Both — Flutterwave & MiniPay/Crypto" },
+                { value: "flutterwave", label: "Flutterwave only (NGN / KES)" },
+                { value: "minipay", label: "MiniPay / Crypto only (manual proof)" },
+              ].map((opt) => (
+                <label key={opt.value} className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-secondary/40">
+                  <input
+                    type="radio"
+                    name="payment_methods"
+                    value={opt.value}
+                    checked={(settings.payment_methods || "both") === opt.value}
+                    onChange={(e) => setSettings({ ...settings, payment_methods: e.target.value })}
+                    className="h-4 w-4"
+                  />
+                  <span className="text-sm">{opt.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <div className="border-t border-border pt-5 space-y-5">
             <h3 className="font-display font-semibold">Flutterwave Payments (NGN / KES)</h3>

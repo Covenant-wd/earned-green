@@ -86,48 +86,61 @@ export default function DashboardPage() {
             <p className="text-muted-foreground mb-6">
               Your account is awaiting admin approval. Please complete the payment to activate your account.
             </p>
-            {settings && (
-              <div className="glass-card p-4 text-left mb-4">
-                <h3 className="font-semibold mb-2">Payment Instructions</h3>
-                <p className="text-sm text-muted-foreground mb-3">{settings.payment_instructions}</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Registration Fee:</span>
-                    <span className="font-mono-amount glow-text">${Number(settings.registration_fee).toFixed(2)}</span>
+            {settings && (() => {
+              const method = (settings as any).payment_methods || "both";
+              const showFlw = (method === "both" || method === "flutterwave") && (settings as any).flutterwave_enabled;
+              const showManual = method === "both" || method === "minipay";
+              return (
+                <>
+                  <div className="glass-card p-4 text-left mb-4">
+                    <h3 className="font-semibold mb-2">Payment Instructions</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{settings.payment_instructions}</p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Registration Fee:</span>
+                        <span className="font-mono-amount glow-text">${Number(settings.registration_fee).toFixed(2)}</span>
+                      </div>
+                      {showManual && (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">MiniPay Number:</span>
+                            <span className="font-mono text-sm">{settings.minipay_number}</span>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-muted-foreground">Wallet Address (TRC20):</span>
+                            <span className="font-mono text-xs break-all">{settings.admin_wallet_address}</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">MiniPay Number:</span>
-                    <span className="font-mono text-sm">{settings.minipay_number}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-muted-foreground">Wallet Address (TRC20):</span>
-                    <span className="font-mono text-xs break-all">{settings.admin_wallet_address}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            {profile.payment_proof_url ? (
-              <div className="text-sm text-success">✓ Payment proof uploaded. Awaiting admin review.</div>
-            ) : (
-              <>
-                {settings?.flutterwave_enabled && (
-                  <div className="mb-4 p-4 rounded-lg border border-border">
-                    <h4 className="font-semibold text-sm mb-3 text-left">Pay instantly with Flutterwave</h4>
-                    <FlutterwavePayment purpose="registration" fixedUsdtAmount={Number(settings.registration_fee)} />
-                    <p className="text-xs text-muted-foreground text-center mt-3">— or upload proof of crypto payment —</p>
-                  </div>
-                )}
-                <label>
-                  <Button className="w-full gradient-primary text-primary-foreground" disabled={uploading} asChild>
-                    <span>
-                      <Upload className="h-4 w-4 mr-2" />
-                      {uploading ? "Uploading..." : "Upload Payment Proof"}
-                    </span>
-                  </Button>
-                  <input type="file" accept="image/*" className="hidden" onChange={handleUploadProof} />
-                </label>
-              </>
-            )}
+                  {profile.payment_proof_url ? (
+                    <div className="text-sm text-success">✓ Payment proof uploaded. Awaiting admin review.</div>
+                  ) : (
+                    <>
+                      {showFlw && (
+                        <div className="mb-4 p-4 rounded-lg border border-border">
+                          <h4 className="font-semibold text-sm mb-3 text-left">Pay instantly with Flutterwave</h4>
+                          <FlutterwavePayment purpose="registration" fixedUsdtAmount={Number(settings.registration_fee)} />
+                          {showManual && <p className="text-xs text-muted-foreground text-center mt-3">— or upload proof of crypto payment —</p>}
+                        </div>
+                      )}
+                      {showManual && (
+                        <label>
+                          <Button className="w-full gradient-primary text-primary-foreground" disabled={uploading} asChild>
+                            <span>
+                              <Upload className="h-4 w-4 mr-2" />
+                              {uploading ? "Uploading..." : "Upload Payment Proof"}
+                            </span>
+                          </Button>
+                          <input type="file" accept="image/*" className="hidden" onChange={handleUploadProof} />
+                        </label>
+                      )}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </motion.div>
       </div>
