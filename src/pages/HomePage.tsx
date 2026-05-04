@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Vault,
@@ -15,25 +15,6 @@ import {
   Globe,
   Lock,
 } from "lucide-react";
-
-/* ─── tiny hook: animate numbers counting up ─── */
-function useCountUp(target: number, duration = 1800, start = false) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let raf: number;
-    const t0 = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - t0) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(ease * target));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [start, target, duration]);
-  return val;
-}
 
 /* ─── step data ─── */
 const steps = [
@@ -119,22 +100,6 @@ const testimonials = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const statsRef = useRef<HTMLDivElement>(null);
-  const [statsVisible, setStatsVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setStatsVisible(true); },
-      { threshold: 0.3 }
-    );
-    if (statsRef.current) obs.observe(statsRef.current);
-    return () => obs.disconnect();
-  }, []);
-
-  const users = useCountUp(12400, 2000, statsVisible);
-  const paid = useCountUp(98600, 2200, statsVisible);
-  const tasks = useCountUp(340, 1600, statsVisible);
-
   return (
     <div
       style={{
