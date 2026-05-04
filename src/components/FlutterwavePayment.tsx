@@ -30,7 +30,9 @@ export function FlutterwavePayment({ purpose, fixedUsdtAmount }: Props) {
   }, []);
 
   if (!settings) return null;
+  const method = (settings as any).payment_methods || "both";
   if (!(settings as any).flutterwave_enabled) return null;
+  if (method === "minipay") return null;
 
   const rate =
     currency === "NGN"
