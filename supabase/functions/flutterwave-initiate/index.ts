@@ -77,6 +77,20 @@ Deno.serve(async (req) => {
       );
     }
 
+    const flwSecret =
+      (settings as any).flutterwave_secret_key ||
+      Deno.env.get("FLUTTERWAVE_SECRET_KEY") ||
+      "";
+    if (!flwSecret) {
+      return new Response(
+        JSON.stringify({ error: "Flutterwave secret key not configured" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     // For registration, force USDT amount = registration_fee
     const finalUsdt =
       purpose === "registration" ? Number(settings.registration_fee) : usdtAmount;
