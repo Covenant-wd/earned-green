@@ -12,7 +12,26 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const expectedHash = Deno.env.get("FLUTTERWAVE_WEBHOOK_HASH")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(supabaseUrl, serviceKey);
+
+    // Load secrets from admin_settings (fallback to env vars)
+    const { data: dbSettings } = await admin
+      .from("admin_settings")
+      .select("flutterwave_secret_key, flutterwave_webhook_hash")
+      .limit(1)
+      .single();
+
+    const expectedHash =
+      (dbSettings as any)?.flutterwave_webhook_hash ||
+      Deno.env.get("FLUTTERWAVE_WEBHOOK_HASH") ||
+      "";
+    const flwSecret =
+      (dbSettings as any)?.flutterwave_secret_key ||
+      Deno.env.get("FLUTTERWAVE_SECRET_KEY") ||
+      "";
+
     const receivedHash = req.headers.get("verif-hash");
     if (!expectedHash || receivedHash !== expectedHash) {
       console.warn("Webhook: invalid hash");
@@ -20,11 +39,6 @@ Deno.serve(async (req) => {
     }
 
     const payload = await req.json();
-    const flwSecret = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const admin = createClient(supabaseUrl, serviceKey);
-
     const data = payload.data || payload;
     const tx_ref = data.tx_ref;
     const flwTxId = data.id;

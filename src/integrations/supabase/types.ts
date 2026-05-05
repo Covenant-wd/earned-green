@@ -18,6 +18,10 @@ export type Database = {
         Row: {
           admin_wallet_address: string | null
           flutterwave_enabled: boolean
+          flutterwave_encryption_key: string | null
+          flutterwave_public_key: string | null
+          flutterwave_secret_key: string | null
+          flutterwave_webhook_hash: string | null
           id: string
           minipay_number: string | null
           payment_instructions: string | null
@@ -30,6 +34,10 @@ export type Database = {
         Insert: {
           admin_wallet_address?: string | null
           flutterwave_enabled?: boolean
+          flutterwave_encryption_key?: string | null
+          flutterwave_public_key?: string | null
+          flutterwave_secret_key?: string | null
+          flutterwave_webhook_hash?: string | null
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
@@ -42,6 +50,10 @@ export type Database = {
         Update: {
           admin_wallet_address?: string | null
           flutterwave_enabled?: boolean
+          flutterwave_encryption_key?: string | null
+          flutterwave_public_key?: string | null
+          flutterwave_secret_key?: string | null
+          flutterwave_webhook_hash?: string | null
           id?: string
           minipay_number?: string | null
           payment_instructions?: string | null
@@ -598,6 +610,20 @@ export type Database = {
         Returns: Json
       }
       generate_referral_code: { Args: never; Returns: string }
+      get_public_settings: {
+        Args: never
+        Returns: {
+          admin_wallet_address: string
+          flutterwave_enabled: boolean
+          minipay_number: string
+          payment_instructions: string
+          payment_methods: string
+          referral_bonus_percent: number
+          registration_fee: number
+          usdt_to_kes_rate: number
+          usdt_to_ngn_rate: number
+        }[]
+      }
       get_user_downlines: {
         Args: { _profile_id: string }
         Returns: {

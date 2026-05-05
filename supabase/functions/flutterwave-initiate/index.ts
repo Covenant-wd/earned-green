@@ -23,7 +23,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const flwSecret = Deno.env.get("FLUTTERWAVE_SECRET_KEY")!;
 
     const userClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
@@ -71,6 +70,20 @@ Deno.serve(async (req) => {
     if (!settings?.flutterwave_enabled) {
       return new Response(
         JSON.stringify({ error: "Flutterwave payments are disabled" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const flwSecret =
+      (settings as any).flutterwave_secret_key ||
+      Deno.env.get("FLUTTERWAVE_SECRET_KEY") ||
+      "";
+    if (!flwSecret) {
+      return new Response(
+        JSON.stringify({ error: "Flutterwave secret key not configured" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

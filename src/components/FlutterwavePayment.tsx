@@ -22,11 +22,8 @@ export function FlutterwavePayment({ purpose, fixedUsdtAmount }: Props) {
 
   useEffect(() => {
     supabase
-      .from("admin_settings")
-      .select("*")
-      .limit(1)
-      .single()
-      .then(({ data }) => setSettings(data));
+      .rpc("get_public_settings")
+      .then(({ data }) => setSettings(Array.isArray(data) ? data[0] : data));
   }, []);
 
   if (!settings) return null;

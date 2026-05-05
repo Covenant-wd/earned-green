@@ -31,6 +31,10 @@ export default function AdminSettingsPage() {
       usdt_to_kes_rate: settings.usdt_to_kes_rate,
       flutterwave_enabled: settings.flutterwave_enabled,
       payment_methods: settings.payment_methods,
+      flutterwave_public_key: settings.flutterwave_public_key ?? "",
+      flutterwave_secret_key: settings.flutterwave_secret_key ?? "",
+      flutterwave_encryption_key: settings.flutterwave_encryption_key ?? "",
+      flutterwave_webhook_hash: settings.flutterwave_webhook_hash ?? "",
     } as any).eq("id", settings.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
@@ -92,6 +96,56 @@ export default function AdminSettingsPage() {
               <br />
               <span className="font-mono break-all text-foreground">https://ljhpnkleqfgudfqkebog.supabase.co/functions/v1/flutterwave-webhook</span>
             </p>
+          </div>
+
+          <div className="border-t border-border pt-5 space-y-4">
+            <div>
+              <h3 className="font-display font-semibold">Flutterwave API Keys</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Paste these from your Flutterwave dashboard → Settings → API Keys. The Secret Hash is whatever value you set in Settings → Webhooks → Secret hash (any string up to 36 chars).
+              </p>
+            </div>
+            <div>
+              <Label>Public Key</Label>
+              <Input
+                value={settings.flutterwave_public_key || ""}
+                onChange={(e) => setSettings({ ...settings, flutterwave_public_key: e.target.value })}
+                placeholder="FLWPUBK-..."
+                className="bg-secondary border-border font-mono text-xs"
+              />
+            </div>
+            <div>
+              <Label>Secret Key</Label>
+              <Input
+                type="password"
+                value={settings.flutterwave_secret_key || ""}
+                onChange={(e) => setSettings({ ...settings, flutterwave_secret_key: e.target.value })}
+                placeholder="FLWSECK-..."
+                className="bg-secondary border-border font-mono text-xs"
+              />
+            </div>
+            <div>
+              <Label>Encryption Key</Label>
+              <Input
+                type="password"
+                value={settings.flutterwave_encryption_key || ""}
+                onChange={(e) => setSettings({ ...settings, flutterwave_encryption_key: e.target.value })}
+                placeholder="FLWSECK_TEST..."
+                className="bg-secondary border-border font-mono text-xs"
+              />
+            </div>
+            <div>
+              <Label>Webhook Secret Hash</Label>
+              <Input
+                type="password"
+                value={settings.flutterwave_webhook_hash || ""}
+                onChange={(e) => setSettings({ ...settings, flutterwave_webhook_hash: e.target.value })}
+                placeholder="Any string up to 36 chars"
+                maxLength={36}
+                className="bg-secondary border-border font-mono text-xs"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Must match the Secret hash you saved in Flutterwave → Settings → Webhooks.</p>
+            </div>
           </div>
 
           <Button className="gradient-primary text-primary-foreground" onClick={handleSave}><Save className="h-4 w-4 mr-2" /> Save Settings</Button>
