@@ -40,8 +40,8 @@ export function FlutterwavePayment({ purpose, fixedUsdtAmount }: Props) {
   const symbol = currency === "NGN" ? "₦" : "KSh";
 
   const handlePay = async () => {
-    if (purpose === "deposit" && amt < 1) {
-      toast.error("Minimum deposit is 1 USDT");
+    if (purpose === "deposit" && amt < 0.01) {
+      toast.error("Minimum deposit is 0.01 USDT");
       return;
     }
     setLoading(true);
@@ -79,7 +79,7 @@ export function FlutterwavePayment({ purpose, fixedUsdtAmount }: Props) {
             value={usdtAmount}
             onChange={(e) => setUsdtAmount(e.target.value)}
             placeholder="0.00"
-            min="1"
+            min="0.01"
             step="0.01"
             className="bg-secondary border-border font-mono"
           />
