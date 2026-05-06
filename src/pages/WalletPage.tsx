@@ -19,10 +19,14 @@ export default function WalletPage() {
   const [minipayNumber, setMinipayNumber] = useState("");
   const [copied, setCopied] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any>(null);
+  const [depositAmount, setDepositAmount] = useState("");
+  const [uploadingProof, setUploadingProof] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     supabase.from("transactions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).then(({ data }) => setTransactions(data || []));
+    supabase.rpc("get_public_settings").then(({ data }) => setSettings(Array.isArray(data) ? data[0] : data));
   }, [user]);
 
   if (!profile) return null;
