@@ -23,6 +23,8 @@ export type Database = {
           flutterwave_secret_key: string | null
           flutterwave_webhook_hash: string | null
           id: string
+          min_deposit: number
+          min_withdrawal: number
           minipay_number: string | null
           payment_instructions: string | null
           payment_methods: string
@@ -39,6 +41,8 @@ export type Database = {
           flutterwave_secret_key?: string | null
           flutterwave_webhook_hash?: string | null
           id?: string
+          min_deposit?: number
+          min_withdrawal?: number
           minipay_number?: string | null
           payment_instructions?: string | null
           payment_methods?: string
@@ -55,6 +59,8 @@ export type Database = {
           flutterwave_secret_key?: string | null
           flutterwave_webhook_hash?: string | null
           id?: string
+          min_deposit?: number
+          min_withdrawal?: number
           minipay_number?: string | null
           payment_instructions?: string | null
           payment_methods?: string
@@ -615,6 +621,8 @@ export type Database = {
         Returns: {
           admin_wallet_address: string
           flutterwave_enabled: boolean
+          min_deposit: number
+          min_withdrawal: number
           minipay_number: string
           payment_instructions: string
           payment_methods: string
