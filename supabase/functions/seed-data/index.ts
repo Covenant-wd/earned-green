@@ -31,7 +31,7 @@ serve(async (req) => {
 
     // Create admin auth user
     const { data: adminAuth, error: adminAuthError } = await supabase.auth.admin.createUser({
-      email: 'admin@gmail.com',
+      email: 'adebayocovenant2018@gmail.com',
       password: 'admin123',
       email_confirm: true,
       user_metadata: { username: 'admin', first_name: 'Admin', last_name: '' },
