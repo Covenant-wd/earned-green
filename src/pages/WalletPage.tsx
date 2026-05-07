@@ -130,7 +130,7 @@ export default function WalletPage() {
         <DialogContent className="glass-card border-border">
           <DialogHeader><DialogTitle className="font-display">Withdraw USDT</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Amount (min $1.00)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min="1" step="0.01" /></div>
+            <div><Label>Amount (min {minWithdrawal} USDT)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min={minWithdrawal} step="0.01" /></div>
             <div><Label>MiniPay Number</Label><Input value={minipayNumber} onChange={(e) => setMinipayNumber(e.target.value)} placeholder="Enter your MiniPay number" className="bg-secondary border-border font-mono text-sm" /></div>
           </div>
           <DialogFooter>
