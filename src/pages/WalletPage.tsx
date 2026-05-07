@@ -40,9 +40,12 @@ export default function WalletPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const minDeposit = Number((settings as any)?.min_deposit ?? 0.01);
+  const minWithdrawal = Number((settings as any)?.min_withdrawal ?? 1);
+
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (isNaN(amt) || amt < 1) { toast.error("Minimum withdrawal is $1.00 USDT"); return; }
+    if (isNaN(amt) || amt < minWithdrawal) { toast.error(`Minimum withdrawal is ${minWithdrawal} USDT`); return; }
     if (amt > profile.usdt_balance) { toast.error("Insufficient balance"); return; }
     if (!minipayNumber.trim()) { toast.error("Enter your MiniPay number"); return; }
     const { error } = await supabase.from("transactions").insert({
@@ -127,7 +130,7 @@ export default function WalletPage() {
         <DialogContent className="glass-card border-border">
           <DialogHeader><DialogTitle className="font-display">Withdraw USDT</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Amount (min $1.00)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min="1" step="0.01" /></div>
+            <div><Label>Amount (min {minWithdrawal} USDT)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min={minWithdrawal} step="0.01" /></div>
             <div><Label>MiniPay Number</Label><Input value={minipayNumber} onChange={(e) => setMinipayNumber(e.target.value)} placeholder="Enter your MiniPay number" className="bg-secondary border-border font-mono text-sm" /></div>
           </div>
           <DialogFooter>
@@ -164,13 +167,13 @@ export default function WalletPage() {
                   )}
                 </div>
                 <div>
-                  <Label>Amount deposited (USDT)</Label>
+                  <Label>Amount deposited (USDT, min {minDeposit})</Label>
                   <Input
                     type="number"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     placeholder="0.00"
-                    min="0.01"
+                    min={minDeposit}
                     step="0.01"
                     className="bg-secondary border-border font-mono"
                   />
@@ -190,7 +193,7 @@ export default function WalletPage() {
                       const file = e.target.files?.[0];
                       if (!file || !user) return;
                       const amt = parseFloat(depositAmount);
-                      if (isNaN(amt) || amt < 0.01) { toast.error("Enter a valid deposit amount"); return; }
+                      if (isNaN(amt) || amt < minDeposit) { toast.error(`Minimum deposit is ${minDeposit} USDT`); return; }
                       setUploadingProof(true);
                       const filePath = `${user.id}/deposit-${Date.now()}-${file.name}`;
                       const { error: upErr } = await supabase.storage.from("payment-proofs").upload(filePath, file);
