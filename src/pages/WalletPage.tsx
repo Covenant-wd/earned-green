@@ -167,13 +167,13 @@ export default function WalletPage() {
                   )}
                 </div>
                 <div>
-                  <Label>Amount deposited (USDT)</Label>
+                  <Label>Amount deposited (USDT, min {minDeposit})</Label>
                   <Input
                     type="number"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     placeholder="0.00"
-                    min="0.01"
+                    min={minDeposit}
                     step="0.01"
                     className="bg-secondary border-border font-mono"
                   />
