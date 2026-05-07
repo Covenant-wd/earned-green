@@ -31,6 +31,8 @@ export default function AdminSettingsPage() {
       usdt_to_kes_rate: settings.usdt_to_kes_rate,
       flutterwave_enabled: settings.flutterwave_enabled,
       payment_methods: settings.payment_methods,
+      min_deposit: settings.min_deposit,
+      min_withdrawal: settings.min_withdrawal,
       flutterwave_public_key: settings.flutterwave_public_key ?? "",
       flutterwave_secret_key: settings.flutterwave_secret_key ?? "",
       flutterwave_encryption_key: settings.flutterwave_encryption_key ?? "",
