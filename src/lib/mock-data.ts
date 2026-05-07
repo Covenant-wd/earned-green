@@ -17,7 +17,7 @@ export const mockUser = {
 export const mockAdminUser = {
   id: "0",
   username: "admin",
-  email: "admin@gmail.com",
+  email: "adebayocovenant2018@gmail.com",
   firstName: "Admin",
   lastName: "",
   usdtBalance: 0,
