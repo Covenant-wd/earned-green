@@ -193,7 +193,7 @@ export default function WalletPage() {
                       const file = e.target.files?.[0];
                       if (!file || !user) return;
                       const amt = parseFloat(depositAmount);
-                      if (isNaN(amt) || amt < 0.01) { toast.error("Enter a valid deposit amount"); return; }
+                      if (isNaN(amt) || amt < minDeposit) { toast.error(`Minimum deposit is ${minDeposit} USDT`); return; }
                       setUploadingProof(true);
                       const filePath = `${user.id}/deposit-${Date.now()}-${file.name}`;
                       const { error: upErr } = await supabase.storage.from("payment-proofs").upload(filePath, file);
