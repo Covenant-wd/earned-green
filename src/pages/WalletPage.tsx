@@ -40,9 +40,12 @@ export default function WalletPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const minDeposit = Number((settings as any)?.min_deposit ?? 0.01);
+  const minWithdrawal = Number((settings as any)?.min_withdrawal ?? 1);
+
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (isNaN(amt) || amt < 1) { toast.error("Minimum withdrawal is $1.00 USDT"); return; }
+    if (isNaN(amt) || amt < minWithdrawal) { toast.error(`Minimum withdrawal is ${minWithdrawal} USDT`); return; }
     if (amt > profile.usdt_balance) { toast.error("Insufficient balance"); return; }
     if (!minipayNumber.trim()) { toast.error("Enter your MiniPay number"); return; }
     const { error } = await supabase.from("transactions").insert({
