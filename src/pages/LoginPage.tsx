@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { DownloadAppButton } from "@/components/DownloadAppButton";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -74,6 +75,10 @@ export default function LoginPage() {
         </div>
         <div className="mt-2 text-center">
           <Link to="/forgot-password" className="text-xs text-muted-foreground hover:text-primary">Forgot password?</Link>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-border">
+          <DownloadAppButton />
         </div>
       </motion.div>
     </div>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { DownloadAppButton } from "@/components/DownloadAppButton";
 
 export default function RegisterPage() {
   const [searchParams] = useSearchParams();
@@ -126,6 +127,10 @@ export default function RegisterPage() {
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link to="/login" className="text-primary hover:underline">Sign In</Link>
+        </div>
+
+        <div className="mt-5 pt-5 border-t border-border">
+          <DownloadAppButton />
         </div>
       </motion.div>
     </div>
