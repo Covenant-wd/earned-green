@@ -33,6 +33,8 @@ export default function AdminSettingsPage() {
       payment_methods: settings.payment_methods,
       min_deposit: settings.min_deposit,
       min_withdrawal: settings.min_withdrawal,
+      apk_download_url: settings.apk_download_url ?? "",
+      apk_version: settings.apk_version ?? "",
       flutterwave_public_key: settings.flutterwave_public_key ?? "",
       flutterwave_secret_key: settings.flutterwave_secret_key ?? "",
       flutterwave_encryption_key: settings.flutterwave_encryption_key ?? "",
@@ -149,6 +151,44 @@ export default function AdminSettingsPage() {
                 className="bg-secondary border-border font-mono text-xs"
               />
               <p className="text-xs text-muted-foreground mt-1">Must match the Secret hash you saved in Flutterwave → Settings → Webhooks.</p>
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-5 space-y-4">
+            <div>
+              <h3 className="font-display font-semibold">Mobile App (Android APK)</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Paste a direct download URL to your built <code>.apk</code> file (e.g. a GitHub Release asset URL, Firebase Hosting, or any CDN). When set, a <strong>Download Android App</strong> button appears on the Sign In and Register pages.
+              </p>
+            </div>
+            <div>
+              <Label>APK Download URL</Label>
+              <Input
+                value={settings.apk_download_url || ""}
+                onChange={(e) => setSettings({ ...settings, apk_download_url: e.target.value })}
+                placeholder="https://github.com/you/entrevault/releases/download/v1.0.0/entrevault.apk"
+                className="bg-secondary border-border font-mono text-xs"
+              />
+            </div>
+            <div>
+              <Label>App Version</Label>
+              <Input
+                value={settings.apk_version || ""}
+                onChange={(e) => setSettings({ ...settings, apk_version: e.target.value })}
+                placeholder="1.0.0"
+                className="bg-secondary border-border font-mono text-xs"
+              />
+            </div>
+            <div className="text-xs text-muted-foreground space-y-1 bg-secondary/40 p-3 rounded-lg">
+              <p className="font-semibold text-foreground">How to build the APK (one-time setup):</p>
+              <ol className="list-decimal pl-4 space-y-0.5">
+                <li>Export this project to GitHub, then <code>git pull</code> and <code>npm install</code></li>
+                <li><code>npm install @capacitor/core @capacitor/cli @capacitor/android</code></li>
+                <li><code>npx cap init EntreVault app.lovable.entrevault</code></li>
+                <li><code>npm run build && npx cap add android && npx cap sync</code></li>
+                <li><code>npx cap open android</code> → Android Studio → Build → Build APK</li>
+                <li>Upload the resulting <code>.apk</code> anywhere public, paste the URL above</li>
+              </ol>
             </div>
           </div>
 
