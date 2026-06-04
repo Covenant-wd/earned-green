@@ -17,6 +17,8 @@ export type Database = {
       admin_settings: {
         Row: {
           admin_wallet_address: string | null
+          apk_download_url: string | null
+          apk_version: string | null
           flutterwave_enabled: boolean
           flutterwave_encryption_key: string | null
           flutterwave_public_key: string | null
@@ -35,6 +37,8 @@ export type Database = {
         }
         Insert: {
           admin_wallet_address?: string | null
+          apk_download_url?: string | null
+          apk_version?: string | null
           flutterwave_enabled?: boolean
           flutterwave_encryption_key?: string | null
           flutterwave_public_key?: string | null
@@ -53,6 +57,8 @@ export type Database = {
         }
         Update: {
           admin_wallet_address?: string | null
+          apk_download_url?: string | null
+          apk_version?: string | null
           flutterwave_enabled?: boolean
           flutterwave_encryption_key?: string | null
           flutterwave_public_key?: string | null
@@ -620,6 +626,8 @@ export type Database = {
         Args: never
         Returns: {
           admin_wallet_address: string
+          apk_download_url: string
+          apk_version: string
           flutterwave_enabled: boolean
           min_deposit: number
           min_withdrawal: number
