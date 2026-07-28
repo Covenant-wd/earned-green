@@ -29,6 +29,8 @@ import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
 import AdminBroadcastPage from "@/pages/admin/AdminBroadcastPage";
 import NotFound from "@/pages/NotFound";
 import HomePage from "@/pages/HomePage";
+import OAuthConsentPage from "@/pages/OAuthConsentPage";
+
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,8 @@ const App = () => (
             <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
+
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
             <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />

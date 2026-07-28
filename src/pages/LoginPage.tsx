@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Vault, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rawNext = searchParams.get("next") ?? "";
+  // Only allow same-origin relative paths.
+  const next = /^\/(?!\/)/.test(rawNext) ? rawNext : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +29,13 @@ export default function LoginPage() {
       toast.error(result.error);
     } else {
       toast.success("Welcome back!");
-      navigate("/dashboard");
+      if (next) {
+        window.location.href = next;
+      } else {
+        navigate("/dashboard");
+      }
     }
+
     setLoading(false);
   };
 
