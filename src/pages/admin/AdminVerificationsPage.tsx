@@ -246,6 +246,30 @@ export default function AdminVerificationsPage() {
                 </div>
               )}
 
+              {Array.isArray(proofDialog.proof_data) && proofDialog.proof_data.length > 0 ? (
+                <div className="space-y-3">
+                  <p className="text-muted-foreground text-sm">Proofs Submitted ({proofDialog.proof_data.length})</p>
+                  {proofDialog.proof_data.map((p: any, i: number) => (
+                    <div key={i} className="bg-secondary/50 rounded-lg p-3 space-y-2">
+                      <p className="text-xs text-muted-foreground">{p.label}</p>
+                      {!p.value ? (
+                        <p className="text-sm italic text-muted-foreground">Not provided</p>
+                      ) : String(p.value).startsWith("http") ? (
+                        <div className="space-y-2">
+                          <a href={ensureAbsoluteUrl(p.value)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 break-all text-sm">
+                            <ExternalLink className="h-4 w-4 shrink-0" /> {p.value}
+                          </a>
+                          {(p.type === "screenshot" || String(p.value).match(/\.(jpg|jpeg|png|gif|webp)$/i)) && (
+                            <img src={ensureAbsoluteUrl(p.value)} alt={p.label} className="w-full max-h-96 object-contain rounded-lg" />
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm whitespace-pre-wrap break-all">{p.value}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
               <div>
                 <p className="text-muted-foreground text-sm mb-1">Proof Submitted</p>
                 <div className="bg-secondary/50 rounded-lg p-4">
@@ -263,6 +287,7 @@ export default function AdminVerificationsPage() {
                   )}
                 </div>
               </div>
+              )}
 
               {proofDialog.tasks?.link && (
                 <div>
