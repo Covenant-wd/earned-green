@@ -80,10 +80,10 @@ const App = () => (
             <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
-            <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
-            <Route path="/courses/:id" element={<ProtectedRoute><CourseDetailPage /></ProtectedRoute>} />
-            <Route path="/guides" element={<ProtectedRoute><GuidesPage /></ProtectedRoute>} />
+            <Route path="/tasks" element={<ApprovedRoute><TasksPage /></ApprovedRoute>} />
+            <Route path="/courses" element={<ApprovedRoute><CoursesPage /></ApprovedRoute>} />
+            <Route path="/courses/:id" element={<ApprovedRoute><CourseDetailPage /></ApprovedRoute>} />
+            <Route path="/guides" element={<ApprovedRoute><GuidesPage /></ApprovedRoute>} />
             <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
