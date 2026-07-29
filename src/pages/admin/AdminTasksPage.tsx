@@ -77,6 +77,9 @@ export default function AdminTasksPage() {
       toast.error("External submissions cannot exceed max submissions");
       return;
     }
+    const cleanedReqs = proofReqs
+      .map((r) => ({ label: r.label.trim(), type: r.type, required: r.required !== false }))
+      .filter((r) => r.label !== "");
     const payload = {
       title: form.title,
       description: form.description,
@@ -87,6 +90,7 @@ export default function AdminTasksPage() {
       difficulty: form.difficulty,
       max_completions: maxCompletions,
       external_completions: externalCompletions,
+      proof_requirements: cleanedReqs,
     };
     if (editingTask) {
       const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
