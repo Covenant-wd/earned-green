@@ -464,6 +464,7 @@ export type Database = {
       task_completions: {
         Row: {
           id: string
+          proof_data: Json
           proof_url: string | null
           reviewed_at: string | null
           status: string
@@ -473,6 +474,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          proof_data?: Json
           proof_url?: string | null
           reviewed_at?: string | null
           status?: string
@@ -482,6 +484,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          proof_data?: Json
           proof_url?: string | null
           reviewed_at?: string | null
           status?: string
@@ -512,6 +515,7 @@ export type Database = {
           link: string | null
           max_completions: number | null
           platform: string | null
+          proof_requirements: Json
           reward_amount: number
           status: string
           title: string
@@ -529,6 +533,7 @@ export type Database = {
           link?: string | null
           max_completions?: number | null
           platform?: string | null
+          proof_requirements?: Json
           reward_amount?: number
           status?: string
           title: string
@@ -546,6 +551,7 @@ export type Database = {
           link?: string | null
           max_completions?: number | null
           platform?: string | null
+          proof_requirements?: Json
           reward_amount?: number
           status?: string
           title?: string

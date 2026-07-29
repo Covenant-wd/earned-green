@@ -21,6 +21,7 @@ export default function AdminTasksPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
   const [form, setForm] = useState({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
+  const [proofReqs, setProofReqs] = useState<{ label: string; type: string; required: boolean }[]>([]);
 
   const loadTasks = async () => {
     const { data } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
@@ -39,6 +40,7 @@ export default function AdminTasksPage() {
   const openCreate = () => {
     setEditingTask(null);
     setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
+    setProofReqs([{ label: "Screenshot of completed task", type: "screenshot", required: true }]);
     setDialogOpen(true);
   };
   const openEdit = (task: any) => {
@@ -54,8 +56,10 @@ export default function AdminTasksPage() {
       maxCompletions: task.max_completions != null ? String(task.max_completions) : "",
       externalCompletions: String(task.external_completions ?? 0),
     });
+    setProofReqs(Array.isArray(task.proof_requirements) ? task.proof_requirements : []);
     setDialogOpen(true);
   };
+
 
   const handleSave = async () => {
     if (!form.title || !form.rewardAmount) { toast.error("Title and reward required"); return; }
@@ -73,6 +77,9 @@ export default function AdminTasksPage() {
       toast.error("External submissions cannot exceed max submissions");
       return;
     }
+    const cleanedReqs = proofReqs
+      .map((r) => ({ label: r.label.trim(), type: r.type, required: r.required !== false }))
+      .filter((r) => r.label !== "");
     const payload = {
       title: form.title,
       description: form.description,
@@ -83,6 +90,7 @@ export default function AdminTasksPage() {
       difficulty: form.difficulty,
       max_completions: maxCompletions,
       external_completions: externalCompletions,
+      proof_requirements: cleanedReqs,
     };
     if (editingTask) {
       const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
@@ -230,6 +238,58 @@ export default function AdminTasksPage() {
               Use "External submissions" to record people you hired off-platform. Slots-left for users = max − (on-platform + external). Task auto-closes when total reaches max.
             </p>
             <div><Label>Link (optional)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="bg-secondary border-border" /></div>
+
+            <div className="border-t border-border pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <Label>Required proofs</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setProofReqs([...proofReqs, { label: "", type: "screenshot", required: true }])}
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Add proof
+                </Button>
+              </div>
+              {proofReqs.length === 0 && (
+                <p className="text-xs text-muted-foreground mb-2">No specific proofs set — users will submit a single free-form proof.</p>
+              )}
+              <div className="space-y-2">
+                {proofReqs.map((r, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="Proof title (e.g. Screenshot of your post)"
+                      value={r.label}
+                      onChange={(e) => setProofReqs(proofReqs.map((p, j) => j === i ? { ...p, label: e.target.value } : p))}
+                      className="bg-secondary border-border flex-1"
+                    />
+                    <Select
+                      value={r.type}
+                      onValueChange={(v) => setProofReqs(proofReqs.map((p, j) => j === i ? { ...p, type: v } : p))}
+                    >
+                      <SelectTrigger className="bg-secondary border-border w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="screenshot">Screenshot</SelectItem>
+                        <SelectItem value="link">Link / URL</SelectItem>
+                        <SelectItem value="text">Text</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setProofReqs(proofReqs.filter((_, j) => j !== i))}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Users must supply every proof listed here before they can submit. Admins see all of them during verification.
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>

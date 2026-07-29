@@ -27,6 +27,9 @@ export default function TasksPage() {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [proofUrl, setProofUrl] = useState("");
+  const [proofValues, setProofValues] = useState<Record<number, string>>({});
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadAll = async () => {
     if (!user) return;
@@ -52,19 +55,66 @@ export default function TasksPage() {
   const approvedCompletions = completions.filter((c) => c.status === "approved");
   const rejectedCompletions = completions.filter((c) => c.status === "rejected");
 
+  const requirements: { label: string; type: string; required?: boolean }[] =
+    Array.isArray(selectedTask?.proof_requirements) ? selectedTask.proof_requirements : [];
+
+  const openSubmit = (task: any) => {
+    setSelectedTask(task);
+    setProofUrl("");
+    setProofValues({});
+    setSubmitDialogOpen(true);
+  };
+
+  const uploadProofFile = async (file: File, idx: number) => {
+    if (!user) return;
+    setUploadingIdx(idx);
+    const filePath = `${user.id}/task-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("payment-proofs").upload(filePath, file);
+    if (error) { toast.error("Upload failed: " + error.message); setUploadingIdx(null); return; }
+    const { data: { publicUrl } } = supabase.storage.from("payment-proofs").getPublicUrl(filePath);
+    setProofValues((prev) => ({ ...prev, [idx]: publicUrl }));
+    setUploadingIdx(null);
+    toast.success("Uploaded");
+  };
+
   const handleSubmit = async () => {
-    if (!proofUrl || !selectedTask || !user) { toast.error("Please provide proof"); return; }
+    if (!selectedTask || !user) return;
+
+    let proofData: { label: string; type: string; value: string }[] = [];
+    let primary = proofUrl;
+
+    if (requirements.length > 0) {
+      for (let i = 0; i < requirements.length; i++) {
+        const req = requirements[i];
+        const value = (proofValues[i] || "").trim();
+        if (req.required !== false && !value) {
+          toast.error(`Please provide: ${req.label}`);
+          return;
+        }
+        proofData.push({ label: req.label, type: req.type, value });
+      }
+      primary = proofData.find((p) => p.value)?.value || "";
+    } else if (!proofUrl.trim()) {
+      toast.error("Please provide proof");
+      return;
+    }
+
+    setSubmitting(true);
     const { error } = await supabase.from("task_completions").insert({
       user_id: user.id,
       task_id: selectedTask.id,
-      proof_url: proofUrl,
+      proof_url: primary,
+      proof_data: proofData,
     });
+    setSubmitting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Task submitted for review!");
     setSubmitDialogOpen(false);
     setProofUrl("");
+    setProofValues({});
     loadAll();
   };
+
 
   const difficultyColor = (d: string) => {
     if (d === "Easy") return "bg-success/10 text-success";
@@ -117,7 +167,7 @@ export default function TasksPage() {
             className="gradient-primary text-primary-foreground"
             disabled={isFull}
             title={isFull ? "Task is full" : undefined}
-            onClick={() => { setSelectedTask(task); setSubmitDialogOpen(true); }}
+            onClick={() => openSubmit(task)}
           >
             <Send className="h-3 w-3 mr-1" /> {isFull ? "Task Full" : "Submit Proof"}
           </Button>
@@ -189,15 +239,49 @@ export default function TasksPage() {
       </Tabs>
 
       <Dialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
-        <DialogContent className="glass-card border-border">
+        <DialogContent className="glass-card border-border max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-display">Submit Proof — {selectedTask?.title}</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Label>Proof URL or description</Label>
-            <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-secondary border-border" />
+          <div className="space-y-4">
+            {requirements.length === 0 ? (
+              <div className="space-y-2">
+                <Label>Proof URL or description</Label>
+                <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-secondary border-border" />
+              </div>
+            ) : (
+              requirements.map((req, i) => (
+                <div key={i} className="space-y-2">
+                  <Label>
+                    {req.label} {req.required === false && <span className="text-xs text-muted-foreground">(optional)</span>}
+                  </Label>
+                  {req.type === "screenshot" ? (
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingIdx !== null}
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadProofFile(f, i); }}
+                        className="bg-secondary border-border"
+                      />
+                      {uploadingIdx === i && <p className="text-xs text-muted-foreground">Uploading...</p>}
+                      {proofValues[i] && (
+                        <img src={proofValues[i]} alt={req.label} className="max-h-40 rounded-lg object-contain" />
+                      )}
+                    </div>
+                  ) : (
+                    <Input
+                      value={proofValues[i] || ""}
+                      onChange={(e) => setProofValues({ ...proofValues, [i]: e.target.value })}
+                      placeholder={req.type === "link" ? "https://..." : "Type your answer"}
+                      className="bg-secondary border-border"
+                    />
+                  )}
+                </div>
+              ))
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-            <Button className="gradient-primary text-primary-foreground" onClick={handleSubmit}>Submit</Button>
+            <Button className="gradient-primary text-primary-foreground" disabled={submitting || uploadingIdx !== null} onClick={handleSubmit}>{submitting ? "Submitting..." : "Submit"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
