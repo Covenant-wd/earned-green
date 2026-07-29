@@ -41,6 +41,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <AppLayout>{children}</AppLayout>;
 }
 
+function ApprovedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isAdmin, loading, profile } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAdmin && profile?.registration_status !== "active") return <Navigate to="/dashboard" replace />;
+  return <AppLayout>{children}</AppLayout>;
+}
+
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAdmin, loading } = useAuth();
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
