@@ -55,19 +55,66 @@ export default function TasksPage() {
   const approvedCompletions = completions.filter((c) => c.status === "approved");
   const rejectedCompletions = completions.filter((c) => c.status === "rejected");
 
+  const requirements: { label: string; type: string; required?: boolean }[] =
+    Array.isArray(selectedTask?.proof_requirements) ? selectedTask.proof_requirements : [];
+
+  const openSubmit = (task: any) => {
+    setSelectedTask(task);
+    setProofUrl("");
+    setProofValues({});
+    setSubmitDialogOpen(true);
+  };
+
+  const uploadProofFile = async (file: File, idx: number) => {
+    if (!user) return;
+    setUploadingIdx(idx);
+    const filePath = `${user.id}/task-${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("payment-proofs").upload(filePath, file);
+    if (error) { toast.error("Upload failed: " + error.message); setUploadingIdx(null); return; }
+    const { data: { publicUrl } } = supabase.storage.from("payment-proofs").getPublicUrl(filePath);
+    setProofValues((prev) => ({ ...prev, [idx]: publicUrl }));
+    setUploadingIdx(null);
+    toast.success("Uploaded");
+  };
+
   const handleSubmit = async () => {
-    if (!proofUrl || !selectedTask || !user) { toast.error("Please provide proof"); return; }
+    if (!selectedTask || !user) return;
+
+    let proofData: { label: string; type: string; value: string }[] = [];
+    let primary = proofUrl;
+
+    if (requirements.length > 0) {
+      for (let i = 0; i < requirements.length; i++) {
+        const req = requirements[i];
+        const value = (proofValues[i] || "").trim();
+        if (req.required !== false && !value) {
+          toast.error(`Please provide: ${req.label}`);
+          return;
+        }
+        proofData.push({ label: req.label, type: req.type, value });
+      }
+      primary = proofData.find((p) => p.value)?.value || "";
+    } else if (!proofUrl.trim()) {
+      toast.error("Please provide proof");
+      return;
+    }
+
+    setSubmitting(true);
     const { error } = await supabase.from("task_completions").insert({
       user_id: user.id,
       task_id: selectedTask.id,
-      proof_url: proofUrl,
+      proof_url: primary,
+      proof_data: proofData,
     });
+    setSubmitting(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Task submitted for review!");
     setSubmitDialogOpen(false);
     setProofUrl("");
+    setProofValues({});
     loadAll();
   };
+
 
   const difficultyColor = (d: string) => {
     if (d === "Easy") return "bg-success/10 text-success";
