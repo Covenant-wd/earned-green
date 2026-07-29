@@ -114,7 +114,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {userItems.map((item) => (
+              {visibleUserItems.map((item) => (
                 <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
