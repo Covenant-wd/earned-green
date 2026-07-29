@@ -167,7 +167,7 @@ export default function TasksPage() {
             className="gradient-primary text-primary-foreground"
             disabled={isFull}
             title={isFull ? "Task is full" : undefined}
-            onClick={() => { setSelectedTask(task); setSubmitDialogOpen(true); }}
+            onClick={() => openSubmit(task)}
           >
             <Send className="h-3 w-3 mr-1" /> {isFull ? "Task Full" : "Submit Proof"}
           </Button>
