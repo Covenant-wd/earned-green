@@ -40,6 +40,7 @@ export default function AdminTasksPage() {
   const openCreate = () => {
     setEditingTask(null);
     setForm({ title: "", description: "", rewardAmount: "", platform: "", link: "", category: "", difficulty: "Easy", maxCompletions: "", externalCompletions: "0" });
+    setProofReqs([{ label: "Screenshot of completed task", type: "screenshot", required: true }]);
     setDialogOpen(true);
   };
   const openEdit = (task: any) => {
@@ -55,8 +56,10 @@ export default function AdminTasksPage() {
       maxCompletions: task.max_completions != null ? String(task.max_completions) : "",
       externalCompletions: String(task.external_completions ?? 0),
     });
+    setProofReqs(Array.isArray(task.proof_requirements) ? task.proof_requirements : []);
     setDialogOpen(true);
   };
+
 
   const handleSave = async () => {
     if (!form.title || !form.rewardAmount) { toast.error("Title and reward required"); return; }
