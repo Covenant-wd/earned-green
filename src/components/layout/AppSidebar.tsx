@@ -60,7 +60,12 @@ export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { isAdmin, logout, user } = useAuth();
+  const { isAdmin, logout, user, profile } = useAuth();
+  const isApproved = isAdmin || profile?.registration_status === "active";
+  const gatedUrls = ["/courses", "/guides", "/tasks"];
+  const visibleUserItems = isApproved
+    ? userItems
+    : userItems.filter((i) => !gatedUrls.includes(i.url));
   const [unreadCount, setUnreadCount] = useState(0);
 
   const isActive = (path: string) => location.pathname === path;
@@ -109,7 +114,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {userItems.map((item) => (
+              {visibleUserItems.map((item) => (
                 <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
                     <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
