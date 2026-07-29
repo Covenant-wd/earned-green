@@ -665,6 +665,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_approved_user: { Args: { _user_id: string }; Returns: boolean }
       reject_task_completion: {
         Args: { _completion_id: string }
         Returns: Json
