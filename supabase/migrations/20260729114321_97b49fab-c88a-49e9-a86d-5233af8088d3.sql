@@ -1,0 +1,2 @@
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS proof_requirements jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.task_completions ADD COLUMN IF NOT EXISTS proof_data jsonb NOT NULL DEFAULT '[]'::jsonb;
