@@ -239,15 +239,49 @@ export default function TasksPage() {
       </Tabs>
 
       <Dialog open={submitDialogOpen} onOpenChange={setSubmitDialogOpen}>
-        <DialogContent className="glass-card border-border">
+        <DialogContent className="glass-card border-border max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-display">Submit Proof — {selectedTask?.title}</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Label>Proof URL or description</Label>
-            <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-secondary border-border" />
+          <div className="space-y-4">
+            {requirements.length === 0 ? (
+              <div className="space-y-2">
+                <Label>Proof URL or description</Label>
+                <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-secondary border-border" />
+              </div>
+            ) : (
+              requirements.map((req, i) => (
+                <div key={i} className="space-y-2">
+                  <Label>
+                    {req.label} {req.required === false && <span className="text-xs text-muted-foreground">(optional)</span>}
+                  </Label>
+                  {req.type === "screenshot" ? (
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        disabled={uploadingIdx !== null}
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadProofFile(f, i); }}
+                        className="bg-secondary border-border"
+                      />
+                      {uploadingIdx === i && <p className="text-xs text-muted-foreground">Uploading...</p>}
+                      {proofValues[i] && (
+                        <img src={proofValues[i]} alt={req.label} className="max-h-40 rounded-lg object-contain" />
+                      )}
+                    </div>
+                  ) : (
+                    <Input
+                      value={proofValues[i] || ""}
+                      onChange={(e) => setProofValues({ ...proofValues, [i]: e.target.value })}
+                      placeholder={req.type === "link" ? "https://..." : "Type your answer"}
+                      className="bg-secondary border-border"
+                    />
+                  )}
+                </div>
+              ))
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSubmitDialogOpen(false)}>Cancel</Button>
-            <Button className="gradient-primary text-primary-foreground" onClick={handleSubmit}>Submit</Button>
+            <Button className="gradient-primary text-primary-foreground" disabled={submitting || uploadingIdx !== null} onClick={handleSubmit}>{submitting ? "Submitting..." : "Submit"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
