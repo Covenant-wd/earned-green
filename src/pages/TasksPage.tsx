@@ -27,6 +27,9 @@ export default function TasksPage() {
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [proofUrl, setProofUrl] = useState("");
+  const [proofValues, setProofValues] = useState<Record<number, string>>({});
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const loadAll = async () => {
     if (!user) return;
