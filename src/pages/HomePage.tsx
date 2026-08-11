@@ -3,15 +3,6 @@ import { motion } from "framer-motion";
 import { Vault, Search, ClipboardCheck, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay, ease: "easeOut" },
-  }),
-};
-
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -68,30 +59,27 @@ export default function HomePage() {
         {/* Hero */}
         <section className="flex flex-col items-center justify-center px-4 pb-20 pt-16 text-center md:pb-28 md:pt-24">
           <motion.span
-            custom={0}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0, ease: "easeOut" }}
             className="mb-6 inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary"
           >
             EntreVault Work Network
           </motion.span>
 
           <motion.h1
-            custom={0.08}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.08, ease: "easeOut" }}
             className="max-w-3xl font-display text-4xl font-bold leading-tight tracking-tight md:text-6xl"
           >
             More Tasks. More Opportunities.
           </motion.h1>
 
           <motion.p
-            custom={0.16}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
             className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg"
           >
             EntreVault brings legitimate digital tasks from multiple sources into
@@ -99,10 +87,9 @@ export default function HomePage() {
           </motion.p>
 
           <motion.div
-            custom={0.24}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.24, ease: "easeOut" }}
             className="mt-8 flex flex-col items-center gap-4 sm:flex-row"
           >
             <Button
@@ -122,10 +109,9 @@ export default function HomePage() {
           </motion.div>
 
           <motion.p
-            custom={0.32}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.32, ease: "easeOut" }}
             className="mt-6 max-w-md text-xs leading-5 text-muted-foreground/70"
           >
             Task availability varies. Payment is based on successfully completed
