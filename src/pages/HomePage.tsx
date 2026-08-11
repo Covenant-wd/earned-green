@@ -2,6 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Vault, Search, ClipboardCheck, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -35,7 +36,8 @@ export default function HomePage() {
             </a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3">
+            <ThemeToggle className="h-9 w-9 text-muted-foreground hover:text-foreground" />
             <Button
               variant="ghost"
               size="sm"
