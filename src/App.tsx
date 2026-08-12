@@ -13,6 +13,7 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import DashboardPage from "@/pages/DashboardPage";
 import TasksPage from "@/pages/TasksPage";
+import TaskDetailPage from "@/pages/TaskDetailPage";
 import CoursesPage from "@/pages/CoursesPage";
 import CourseDetailPage from "@/pages/CourseDetailPage";
 import GuidesPage from "@/pages/GuidesPage";
@@ -84,6 +85,7 @@ const App = () => (
 
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/tasks" element={<ApprovedRoute><TasksPage /></ApprovedRoute>} />
+            <Route path="/tasks/:id" element={<ApprovedRoute><TaskDetailPage /></ApprovedRoute>} />
             <Route path="/courses" element={<ApprovedRoute><CoursesPage /></ApprovedRoute>} />
             <Route path="/courses/:id" element={<ApprovedRoute><CourseDetailPage /></ApprovedRoute>} />
             <Route path="/guides" element={<ApprovedRoute><GuidesPage /></ApprovedRoute>} />
