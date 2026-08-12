@@ -95,10 +95,10 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="icon" className="border-r-0 bg-sidebar">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl gradient-primary">
             <Vault className="h-4 w-4 text-primary-foreground" />
           </div>
           {!collapsed && (
@@ -117,7 +117,7 @@ export function AppSidebar() {
               {visibleUserItems.map((item) => (
                 <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
+                    <NavLink to={item.url} end activeClassName="bg-background text-primary neu-inset">
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span className="flex-1">{item.title}</span>}
                       {item.url === "/notifications" && unreadCount > 0 && !collapsed && (
@@ -141,7 +141,7 @@ export function AppSidebar() {
                 {adminItems.map((item) => (
                   <SidebarMenuItem key={item.title} onClick={handleNavClick}>
                     <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                      <NavLink to={item.url} end activeClassName="bg-accent text-accent-foreground">
+                      <NavLink to={item.url} end activeClassName="bg-background text-primary neu-inset">
                         <item.icon className="h-4 w-4" />
                         {!collapsed && <span>{item.title}</span>}
                       </NavLink>

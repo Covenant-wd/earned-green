@@ -82,14 +82,14 @@ export function FlutterwavePayment({ purpose, fixedUsdtAmount }: Props) {
             placeholder="0.00"
             min="0.01"
             step="0.01"
-            className="bg-secondary border-border font-mono"
+            className="bg-background font-mono"
           />
         </div>
       )}
       <div>
         <Label>Pay in</Label>
         <Select value={currency} onValueChange={(v: "NGN" | "KES") => setCurrency(v)}>
-          <SelectTrigger className="bg-secondary border-border">
+          <SelectTrigger className="bg-background">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

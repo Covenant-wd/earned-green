@@ -40,7 +40,7 @@ export default function GuidesPage() {
             placeholder="Search guides..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-secondary border-border"
+            className="pl-9 bg-background"
           />
         </div>
       </div>

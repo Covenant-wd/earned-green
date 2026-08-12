@@ -144,7 +144,7 @@ export default function AdminUsersPage() {
         <h1 className="page-title mb-6">Manage Users</h1>
         <div className="relative mb-6 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email..." className="pl-10 bg-secondary border-border" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name or email..." className="pl-10 bg-background" />
         </div>
         <Tabs defaultValue="pending">
           <TabsList className="glass-card mb-6">
@@ -209,22 +209,22 @@ export default function AdminUsersPage() {
           <DialogHeader><DialogTitle className="font-display">Edit User</DialogTitle></DialogHeader>
           <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>First Name</Label><Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} className="bg-secondary border-border" /></div>
-              <div><Label>Last Name</Label><Input value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} className="bg-secondary border-border" /></div>
+              <div><Label>First Name</Label><Input value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} className="bg-background" /></div>
+              <div><Label>Last Name</Label><Input value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} className="bg-background" /></div>
             </div>
-            <div><Label>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="bg-secondary border-border" /></div>
+            <div><Label>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="bg-background" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Country</Label><Input value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })} className="bg-secondary border-border" /></div>
-              <div><Label>State</Label><Input value={editForm.state} onChange={(e) => setEditForm({ ...editForm, state: e.target.value })} className="bg-secondary border-border" /></div>
+              <div><Label>Country</Label><Input value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })} className="bg-background" /></div>
+              <div><Label>State</Label><Input value={editForm.state} onChange={(e) => setEditForm({ ...editForm, state: e.target.value })} className="bg-background" /></div>
             </div>
-            <div><Label>Address</Label><Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="bg-secondary border-border" /></div>
-            <div><Label>Wallet Address</Label><Input value={editForm.wallet_address} onChange={(e) => setEditForm({ ...editForm, wallet_address: e.target.value })} className="bg-secondary border-border font-mono text-sm" /></div>
+            <div><Label>Address</Label><Input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="bg-background" /></div>
+            <div><Label>Wallet Address</Label><Input value={editForm.wallet_address} onChange={(e) => setEditForm({ ...editForm, wallet_address: e.target.value })} className="bg-background font-mono text-sm" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>USDT Balance</Label><Input type="number" value={editForm.usdt_balance} onChange={(e) => setEditForm({ ...editForm, usdt_balance: e.target.value })} className="bg-secondary border-border font-mono" step="0.01" /></div>
+              <div><Label>USDT Balance</Label><Input type="number" value={editForm.usdt_balance} onChange={(e) => setEditForm({ ...editForm, usdt_balance: e.target.value })} className="bg-background font-mono" step="0.01" /></div>
               <div>
                 <Label>Status</Label>
                 <Select value={editForm.registration_status} onValueChange={(v) => setEditForm({ ...editForm, registration_status: v })}>
-                  <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="active">Active</SelectItem>

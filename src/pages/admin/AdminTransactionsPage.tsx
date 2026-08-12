@@ -129,7 +129,7 @@ export default function AdminTransactionsPage() {
         <h1 className="page-title mb-6">Transactions</h1>
         <div className="relative mb-6 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email or type..." className="pl-10 bg-secondary border-border" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email or type..." className="pl-10 bg-background" />
         </div>
         <Tabs defaultValue="pending">
           <TabsList className="glass-card mb-6">
@@ -177,7 +177,7 @@ export default function AdminTransactionsPage() {
       <Dialog open={!!txHashDialog} onOpenChange={() => setTxHashDialog(null)}>
         <DialogContent className="glass-card border-border">
           <DialogHeader><DialogTitle className="font-display">Approve Withdrawal</DialogTitle></DialogHeader>
-          <div><Label>Transaction Hash (optional)</Label><Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Enter tx hash..." className="bg-secondary border-border font-mono text-sm" /></div>
+          <div><Label>Transaction Hash (optional)</Label><Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Enter tx hash..." className="bg-background font-mono text-sm" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTxHashDialog(null)}>Cancel</Button>
             <Button

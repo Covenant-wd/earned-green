@@ -10,10 +10,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/90 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-0 bg-background/90 backdrop-blur-md">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl gradient-primary">
               <Vault className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-primary">
@@ -64,7 +64,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0, ease: "easeOut" }}
-            className="mb-6 inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary"
+            className="mb-6 inline-block rounded-full border-0 bg-background neu-inset px-5 py-2 text-xs font-semibold uppercase tracking-widest text-primary"
           >
             EntreVault Work Network
           </motion.span>
@@ -124,7 +124,7 @@ export default function HomePage() {
         {/* How It Works */}
         <section
           id="how-it-works"
-          className="border-t border-border/50 px-4 py-16 md:py-20"
+          className="border-0 px-4 py-16 md:py-20"
         >
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-10 text-center font-display text-2xl font-bold tracking-tight md:text-3xl">
@@ -151,9 +151,9 @@ export default function HomePage() {
               ].map((step, i) => (
                 <div
                   key={step.title}
-                  className="rounded-xl border border-border/60 bg-card/40 p-6 transition-colors hover:border-primary/30"
+                  className="glass-card-hover p-6"
                 >
-                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-background neu-inset text-primary">
                     <step.icon className="h-5 w-5 text-primary" />
                   </div>
                   <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -207,7 +207,7 @@ export default function HomePage() {
         </section>
 
         {/* Final CTA */}
-        <section className="border-t border-border/50 px-4 py-16 text-center md:py-20">
+        <section className="border-0 px-4 py-16 text-center md:py-20">
           <div className="mx-auto max-w-xl">
             <h2 className="mb-3 font-display text-2xl font-bold tracking-tight md:text-3xl">
               Ready to work?
@@ -228,10 +228,10 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 px-4 py-10">
+      <footer className="border-0 px-4 py-10">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-2xl gradient-primary">
               <Vault className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="font-display text-lg font-bold text-primary">

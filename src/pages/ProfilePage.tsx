@@ -70,37 +70,37 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label>First Name</Label>
-              <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} className="bg-secondary border-border" />
+              <Input value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} className="bg-background" />
             </div>
             <div>
               <Label>Middle Name</Label>
-              <Input value={form.middle_name} onChange={(e) => setForm({ ...form, middle_name: e.target.value })} className="bg-secondary border-border" />
+              <Input value={form.middle_name} onChange={(e) => setForm({ ...form, middle_name: e.target.value })} className="bg-background" />
             </div>
             <div>
               <Label>Last Name</Label>
-              <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} className="bg-secondary border-border" />
+              <Input value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} className="bg-background" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Country</Label>
-              <Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className="bg-secondary border-border" />
+              <Input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className="bg-background" />
             </div>
             <div>
               <Label>State</Label>
-              <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} className="bg-secondary border-border" />
+              <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} className="bg-background" />
             </div>
           </div>
 
           <div>
             <Label>Address</Label>
-            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="bg-secondary border-border" />
+            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="bg-background" />
           </div>
 
           <div>
             <Label>MiniPay Number</Label>
-            <Input value={form.minipay_number} onChange={(e) => setForm({ ...form, minipay_number: e.target.value })} className="bg-secondary border-border font-mono text-sm" placeholder="Enter your MiniPay number" />
+            <Input value={form.minipay_number} onChange={(e) => setForm({ ...form, minipay_number: e.target.value })} className="bg-background font-mono text-sm" placeholder="Enter your MiniPay number" />
           </div>
 
           <div className="glass-card p-4 bg-muted/30 space-y-2">

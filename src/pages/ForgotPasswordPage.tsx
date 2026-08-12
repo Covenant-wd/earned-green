@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
                   placeholder="you@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-secondary border-border"
+                  className="pl-10 bg-background"
                   required
                 />
               </div>

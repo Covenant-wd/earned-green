@@ -245,7 +245,7 @@ export default function TasksPage() {
             {requirements.length === 0 ? (
               <div className="space-y-2">
                 <Label>Proof URL or description</Label>
-                <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-secondary border-border" />
+                <Input value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} placeholder="https://twitter.com/yourpost..." className="bg-background" />
               </div>
             ) : (
               requirements.map((req, i) => (
@@ -260,7 +260,7 @@ export default function TasksPage() {
                         accept="image/*"
                         disabled={uploadingIdx !== null}
                         onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadProofFile(f, i); }}
-                        className="bg-secondary border-border"
+                        className="bg-background"
                       />
                       {uploadingIdx === i && <p className="text-xs text-muted-foreground">Uploading...</p>}
                       {proofValues[i] && (
@@ -272,7 +272,7 @@ export default function TasksPage() {
                       value={proofValues[i] || ""}
                       onChange={(e) => setProofValues({ ...proofValues, [i]: e.target.value })}
                       placeholder={req.type === "link" ? "https://..." : "Type your answer"}
-                      className="bg-secondary border-border"
+                      className="bg-background"
                     />
                   )}
                 </div>

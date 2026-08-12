@@ -87,7 +87,7 @@ export default function AdminBroadcastPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. New course launched!"
-                className="bg-secondary border-border"
+                className="bg-background"
                 maxLength={120}
               />
             </div>
@@ -97,7 +97,7 @@ export default function AdminBroadcastPage() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Write your announcement..."
-                className="bg-secondary border-border"
+                className="bg-background"
                 rows={6}
                 maxLength={1000}
               />
@@ -109,7 +109,7 @@ export default function AdminBroadcastPage() {
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
                 placeholder="/courses or https://..."
-                className="bg-secondary border-border"
+                className="bg-background"
               />
             </div>
             <Button

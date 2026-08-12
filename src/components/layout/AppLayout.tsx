@@ -11,10 +11,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-30 h-14 flex items-center gap-2 border-b border-border bg-background/85 px-3 backdrop-blur-xl md:px-4">
+          <header className="sticky top-0 z-30 h-16 flex items-center gap-2 border-0 bg-background/85 px-3 backdrop-blur-xl md:px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-2 md:hidden">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg gradient-primary">
+              <div className="flex h-7 w-7 items-center justify-center rounded-2xl gradient-primary">
                 <Vault className="h-3.5 w-3.5 text-primary-foreground" />
               </div>
               <span className="font-display text-base font-bold">EntreVault</span>
