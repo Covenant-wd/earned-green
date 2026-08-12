@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-secondary border-border"
+                  className="pl-10 pr-10 bg-background"
                   required
                   minLength={6}
                 />
@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
                   placeholder="••••••••"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
-                  className="pl-10 bg-secondary border-border"
+                  className="pl-10 bg-background"
                   required
                   minLength={6}
                 />

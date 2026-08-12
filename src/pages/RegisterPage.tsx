@@ -82,32 +82,32 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className="bg-secondary border-border" required />
+              <Input id="firstName" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className="bg-background" required />
             </div>
             <div className="space-y-1">
               <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className="bg-secondary border-border" required />
+              <Input id="lastName" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className="bg-background" required />
             </div>
           </div>
           <div className="space-y-1">
             <Label htmlFor="username">Username</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="username" value={form.username} onChange={(e) => update("username", e.target.value)} className="pl-10 bg-secondary border-border" required />
+              <Input id="username" value={form.username} onChange={(e) => update("username", e.target.value)} className="pl-10 bg-background" required />
             </div>
           </div>
           <div className="space-y-1">
             <Label htmlFor="reg-email">Email (@gmail.com only)</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="reg-email" type="email" placeholder="you@gmail.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="pl-10 bg-secondary border-border" required />
+              <Input id="reg-email" type="email" placeholder="you@gmail.com" value={form.email} onChange={(e) => update("email", e.target.value)} className="pl-10 bg-background" required />
             </div>
           </div>
           <div className="space-y-1">
             <Label htmlFor="reg-password">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="reg-password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} className="pl-10 pr-10 bg-secondary border-border" required />
+              <Input id="reg-password" type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} className="pl-10 pr-10 bg-background" required />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -115,11 +115,11 @@ export default function RegisterPage() {
           </div>
           <div className="space-y-1">
             <Label htmlFor="confirm-password">Confirm Password</Label>
-            <Input id="confirm-password" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} className="bg-secondary border-border" required />
+            <Input id="confirm-password" type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} className="bg-background" required />
           </div>
           <div className="space-y-1">
             <Label htmlFor="referral">Referral Code (optional)</Label>
-            <Input id="referral" value={form.referralCode} onChange={(e) => update("referralCode", e.target.value)} className="bg-secondary border-border font-mono text-sm" placeholder="Enter referral code" />
+            <Input id="referral" value={form.referralCode} onChange={(e) => update("referralCode", e.target.value)} className="bg-background font-mono text-sm" placeholder="Enter referral code" />
           </div>
           <Button type="submit" className="w-full gradient-primary text-primary-foreground font-semibold" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}

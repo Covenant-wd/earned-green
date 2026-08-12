@@ -88,7 +88,7 @@ export default function WalletPage() {
             <h3 className="font-display font-semibold mb-3">Referral Link</h3>
             <p className="text-xs text-muted-foreground mb-3">Share and earn a bonus on referral registration fees</p>
             <div className="flex gap-2">
-              <Input value={referralLink} readOnly className="bg-secondary border-border font-mono text-xs" />
+              <Input value={referralLink} readOnly className="bg-background font-mono text-xs" />
               <Button variant="outline" size="icon" onClick={copyLink}>
                 {copied ? <Check className="h-4 w-4 text-success" /> : <Copy className="h-4 w-4" />}
               </Button>
@@ -130,8 +130,8 @@ export default function WalletPage() {
         <DialogContent className="glass-card border-border">
           <DialogHeader><DialogTitle className="font-display">Withdraw USDT</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Amount (min {minWithdrawal} USDT)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-secondary border-border font-mono" min={minWithdrawal} step="0.01" /></div>
-            <div><Label>MiniPay Number</Label><Input value={minipayNumber} onChange={(e) => setMinipayNumber(e.target.value)} placeholder="Enter your MiniPay number" className="bg-secondary border-border font-mono text-sm" /></div>
+            <div><Label>Amount (min {minWithdrawal} USDT)</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="bg-background font-mono" min={minWithdrawal} step="0.01" /></div>
+            <div><Label>MiniPay Number</Label><Input value={minipayNumber} onChange={(e) => setMinipayNumber(e.target.value)} placeholder="Enter your MiniPay number" className="bg-background font-mono text-sm" /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setWithdrawOpen(false)}>Cancel</Button>
@@ -175,7 +175,7 @@ export default function WalletPage() {
                     placeholder="0.00"
                     min={minDeposit}
                     step="0.01"
-                    className="bg-secondary border-border font-mono"
+                    className="bg-background font-mono"
                   />
                 </div>
                 <label>

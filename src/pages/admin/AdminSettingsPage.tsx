@@ -51,13 +51,13 @@ export default function AdminSettingsPage() {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <h1 className="page-title mb-6">Platform Settings</h1>
         <div className="glass-card p-6 max-w-2xl space-y-5">
-          <div><Label>Registration Fee (USDT)</Label><Input type="number" value={settings.registration_fee} onChange={(e) => setSettings({ ...settings, registration_fee: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
-          <div><Label>Referral Bonus (%)</Label><Input type="number" value={settings.referral_bonus_percent} onChange={(e) => setSettings({ ...settings, referral_bonus_percent: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
-          <div><Label>Minimum Deposit (USDT)</Label><Input type="number" step="0.01" value={settings.min_deposit ?? 0.01} onChange={(e) => setSettings({ ...settings, min_deposit: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
-          <div><Label>Minimum Withdrawal (USDT)</Label><Input type="number" step="0.01" value={settings.min_withdrawal ?? 1} onChange={(e) => setSettings({ ...settings, min_withdrawal: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
-          <div><Label>Admin Wallet Address (TRC20)</Label><Input value={settings.admin_wallet_address || ""} onChange={(e) => setSettings({ ...settings, admin_wallet_address: e.target.value })} className="bg-secondary border-border font-mono text-sm" /></div>
-          <div><Label>MiniPay Number</Label><Input value={settings.minipay_number || ""} onChange={(e) => setSettings({ ...settings, minipay_number: e.target.value })} className="bg-secondary border-border font-mono" /></div>
-          <div><Label>Payment Instructions</Label><Textarea value={settings.payment_instructions || ""} onChange={(e) => setSettings({ ...settings, payment_instructions: e.target.value })} className="bg-secondary border-border" rows={4} /></div>
+          <div><Label>Registration Fee (USDT)</Label><Input type="number" value={settings.registration_fee} onChange={(e) => setSettings({ ...settings, registration_fee: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
+          <div><Label>Referral Bonus (%)</Label><Input type="number" value={settings.referral_bonus_percent} onChange={(e) => setSettings({ ...settings, referral_bonus_percent: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
+          <div><Label>Minimum Deposit (USDT)</Label><Input type="number" step="0.01" value={settings.min_deposit ?? 0.01} onChange={(e) => setSettings({ ...settings, min_deposit: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
+          <div><Label>Minimum Withdrawal (USDT)</Label><Input type="number" step="0.01" value={settings.min_withdrawal ?? 1} onChange={(e) => setSettings({ ...settings, min_withdrawal: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
+          <div><Label>Admin Wallet Address (TRC20)</Label><Input value={settings.admin_wallet_address || ""} onChange={(e) => setSettings({ ...settings, admin_wallet_address: e.target.value })} className="bg-background font-mono text-sm" /></div>
+          <div><Label>MiniPay Number</Label><Input value={settings.minipay_number || ""} onChange={(e) => setSettings({ ...settings, minipay_number: e.target.value })} className="bg-background font-mono" /></div>
+          <div><Label>Payment Instructions</Label><Textarea value={settings.payment_instructions || ""} onChange={(e) => setSettings({ ...settings, payment_instructions: e.target.value })} className="bg-background" rows={4} /></div>
 
           <div className="border-t border-border pt-5 space-y-3">
             <Label>Available Payment Methods</Label>
@@ -95,8 +95,8 @@ export default function AdminSettingsPage() {
               />
               <Label htmlFor="flw-enabled" className="cursor-pointer">Enable Flutterwave checkout for registration & deposits</Label>
             </div>
-            <div><Label>USDT → NGN rate (1 USDT = ₦?)</Label><Input type="number" value={settings.usdt_to_ngn_rate ?? 1600} onChange={(e) => setSettings({ ...settings, usdt_to_ngn_rate: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
-            <div><Label>USDT → KES rate (1 USDT = KSh?)</Label><Input type="number" value={settings.usdt_to_kes_rate ?? 130} onChange={(e) => setSettings({ ...settings, usdt_to_kes_rate: parseFloat(e.target.value) })} className="bg-secondary border-border font-mono" /></div>
+            <div><Label>USDT → NGN rate (1 USDT = ₦?)</Label><Input type="number" value={settings.usdt_to_ngn_rate ?? 1600} onChange={(e) => setSettings({ ...settings, usdt_to_ngn_rate: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
+            <div><Label>USDT → KES rate (1 USDT = KSh?)</Label><Input type="number" value={settings.usdt_to_kes_rate ?? 130} onChange={(e) => setSettings({ ...settings, usdt_to_kes_rate: parseFloat(e.target.value) })} className="bg-background font-mono" /></div>
             <p className="text-xs text-muted-foreground">
               Webhook URL (set this in your Flutterwave dashboard):
               <br />
@@ -117,7 +117,7 @@ export default function AdminSettingsPage() {
                 value={settings.flutterwave_public_key || ""}
                 onChange={(e) => setSettings({ ...settings, flutterwave_public_key: e.target.value })}
                 placeholder="FLWPUBK-..."
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
             </div>
             <div>
@@ -127,7 +127,7 @@ export default function AdminSettingsPage() {
                 value={settings.flutterwave_secret_key || ""}
                 onChange={(e) => setSettings({ ...settings, flutterwave_secret_key: e.target.value })}
                 placeholder="FLWSECK-..."
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
             </div>
             <div>
@@ -137,7 +137,7 @@ export default function AdminSettingsPage() {
                 value={settings.flutterwave_encryption_key || ""}
                 onChange={(e) => setSettings({ ...settings, flutterwave_encryption_key: e.target.value })}
                 placeholder="FLWSECK_TEST..."
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
             </div>
             <div>
@@ -148,7 +148,7 @@ export default function AdminSettingsPage() {
                 onChange={(e) => setSettings({ ...settings, flutterwave_webhook_hash: e.target.value })}
                 placeholder="Any string up to 36 chars"
                 maxLength={36}
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
               <p className="text-xs text-muted-foreground mt-1">Must match the Secret hash you saved in Flutterwave → Settings → Webhooks.</p>
             </div>
@@ -167,7 +167,7 @@ export default function AdminSettingsPage() {
                 value={settings.apk_download_url || ""}
                 onChange={(e) => setSettings({ ...settings, apk_download_url: e.target.value })}
                 placeholder="https://github.com/you/entrevault/releases/download/v1.0.0/entrevault.apk"
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
             </div>
             <div>
@@ -176,7 +176,7 @@ export default function AdminSettingsPage() {
                 value={settings.apk_version || ""}
                 onChange={(e) => setSettings({ ...settings, apk_version: e.target.value })}
                 placeholder="1.0.0"
-                className="bg-secondary border-border font-mono text-xs"
+                className="bg-background font-mono text-xs"
               />
             </div>
             <div className="text-xs text-muted-foreground space-y-1 bg-secondary/40 p-3 rounded-lg">

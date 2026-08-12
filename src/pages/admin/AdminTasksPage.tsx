@@ -195,17 +195,17 @@ export default function AdminTasksPage() {
         <DialogContent className="glass-card border-border max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle className="font-display">{editingTask ? "Edit Task" : "Create Task"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-secondary border-border" /></div>
+            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-background" /></div>
             <div><Label>Description</Label><RichTextEditor content={form.description} onChange={(html) => setForm({ ...form, description: html })} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Reward ($)</Label><Input type="number" value={form.rewardAmount} onChange={(e) => setForm({ ...form, rewardAmount: e.target.value })} className="bg-secondary border-border font-mono" /></div>
-              <div><Label>Platform</Label><Input value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} className="bg-secondary border-border" /></div>
+              <div><Label>Reward ($)</Label><Input type="number" value={form.rewardAmount} onChange={(e) => setForm({ ...form, rewardAmount: e.target.value })} className="bg-background font-mono" /></div>
+              <div><Label>Platform</Label><Input value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} className="bg-background" /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Category</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="bg-secondary border-border" /></div>
+              <div><Label>Category</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="bg-background" /></div>
               <div><Label>Difficulty</Label>
                 <Select value={form.difficulty} onValueChange={(v) => setForm({ ...form, difficulty: v })}>
-                  <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="bg-background"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="Easy">Easy</SelectItem><SelectItem value="Medium">Medium</SelectItem><SelectItem value="Hard">Hard</SelectItem></SelectContent>
                 </Select>
               </div>
@@ -219,7 +219,7 @@ export default function AdminTasksPage() {
                   placeholder="e.g. 100"
                   value={form.maxCompletions}
                   onChange={(e) => setForm({ ...form, maxCompletions: e.target.value })}
-                  className="bg-secondary border-border font-mono"
+                  className="bg-background font-mono"
                 />
               </div>
               <div>
@@ -230,14 +230,14 @@ export default function AdminTasksPage() {
                   placeholder="0"
                   value={form.externalCompletions}
                   onChange={(e) => setForm({ ...form, externalCompletions: e.target.value })}
-                  className="bg-secondary border-border font-mono"
+                  className="bg-background font-mono"
                 />
               </div>
             </div>
             <p className="text-xs text-muted-foreground -mt-1">
               Use "External submissions" to record people you hired off-platform. Slots-left for users = max − (on-platform + external). Task auto-closes when total reaches max.
             </p>
-            <div><Label>Link (optional)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="bg-secondary border-border" /></div>
+            <div><Label>Link (optional)</Label><Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} className="bg-background" /></div>
 
             <div className="border-t border-border pt-3">
               <div className="flex items-center justify-between mb-2">
@@ -261,13 +261,13 @@ export default function AdminTasksPage() {
                       placeholder="Proof title (e.g. Screenshot of your post)"
                       value={r.label}
                       onChange={(e) => setProofReqs(proofReqs.map((p, j) => j === i ? { ...p, label: e.target.value } : p))}
-                      className="bg-secondary border-border flex-1"
+                      className="bg-background flex-1"
                     />
                     <Select
                       value={r.type}
                       onValueChange={(v) => setProofReqs(proofReqs.map((p, j) => j === i ? { ...p, type: v } : p))}
                     >
-                      <SelectTrigger className="bg-secondary border-border w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="bg-background w-[140px]"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="screenshot">Screenshot</SelectItem>
                         <SelectItem value="link">Link / URL</SelectItem>

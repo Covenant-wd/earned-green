@@ -129,12 +129,12 @@ export default function AdminLessonsPage() {
         <DialogContent className="glass-card border-border max-w-2xl">
           <DialogHeader><DialogTitle className="font-display">{editing ? "Edit Lesson" : "Add Lesson"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-secondary border-border" /></div>
+            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="bg-background" /></div>
             <div><Label>Content</Label><RichTextEditor content={form.content} onChange={(html) => setForm({ ...form, content: html })} /></div>
-            <div><Label>Video URL (YouTube, TikTok, etc.)</Label><Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} className="bg-secondary border-border" placeholder="https://youtube.com/watch?v=..." /></div>
+            <div><Label>Video URL (YouTube, TikTok, etc.)</Label><Input value={form.video_url} onChange={(e) => setForm({ ...form, video_url: e.target.value })} className="bg-background" placeholder="https://youtube.com/watch?v=..." /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Duration (minutes)</Label><Input type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })} className="bg-secondary border-border" /></div>
-              <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className="bg-secondary border-border" /></div>
+              <div><Label>Duration (minutes)</Label><Input type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })} className="bg-background" /></div>
+              <div><Label>Sort Order</Label><Input type="number" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className="bg-background" /></div>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={form.is_published} onCheckedChange={(v) => setForm({ ...form, is_published: v })} />
