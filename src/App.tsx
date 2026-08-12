@@ -13,6 +13,7 @@ import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import DashboardPage from "@/pages/DashboardPage";
 import TasksPage from "@/pages/TasksPage";
+import TaskDetailPage from "@/pages/TaskDetailPage";
 import CoursesPage from "@/pages/CoursesPage";
 import CourseDetailPage from "@/pages/CourseDetailPage";
 import GuidesPage from "@/pages/GuidesPage";
