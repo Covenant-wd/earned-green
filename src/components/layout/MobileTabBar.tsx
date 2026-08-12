@@ -17,7 +17,7 @@ export function MobileTabBar() {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl safe-bottom md:hidden">
+    <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[var(--radius)] border-0 bg-background neu-raised safe-bottom md:hidden">
       <ul className="flex items-stretch justify-around">
         {items.map((item) => {
           const active = location.pathname === item.url;
@@ -32,8 +32,8 @@ export function MobileTabBar() {
               >
                 <span
                   className={cn(
-                    "flex h-7 w-12 items-center justify-center rounded-full transition-colors",
-                    active && "bg-accent"
+                    "flex h-8 w-12 items-center justify-center rounded-full transition-all duration-300",
+                    active ? "neu-inset text-primary" : "neu-flat"
                   )}
                 >
                   <item.icon className="h-[1.1rem] w-[1.1rem]" />
