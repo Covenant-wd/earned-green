@@ -85,6 +85,7 @@ const App = () => (
 
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/tasks" element={<ApprovedRoute><TasksPage /></ApprovedRoute>} />
+            <Route path="/tasks/:id" element={<ApprovedRoute><TaskDetailPage /></ApprovedRoute>} />
             <Route path="/courses" element={<ApprovedRoute><CoursesPage /></ApprovedRoute>} />
             <Route path="/courses/:id" element={<ApprovedRoute><CourseDetailPage /></ApprovedRoute>} />
             <Route path="/guides" element={<ApprovedRoute><GuidesPage /></ApprovedRoute>} />
