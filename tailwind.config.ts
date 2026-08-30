@@ -14,10 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        display: ["Bricolage Grotesque", "system-ui", "sans-serif"],
+        body: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
