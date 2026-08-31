@@ -1,71 +1,40 @@
-import { useEffect, useState } from "react";
-import { LayoutDashboard, ListChecks, Wallet, Bell, UserCircle } from "lucide-react";
+import { LayoutDashboard, BookOpen, CalendarClock, Bell, UserCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useUnreadNotifications } from "@/hooks/use-unread-notifications";
 import { cn } from "@/lib/utils";
+
+const items = [
+  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Learn", url: "/learn", icon: BookOpen },
+  { title: "Classes", url: "/schedule", icon: CalendarClock },
+  { title: "Alerts", url: "/notifications", icon: Bell },
+  { title: "Profile", url: "/profile", icon: UserCircle },
+];
 
 export function MobileTabBar() {
   const location = useLocation();
-  const { isAdmin, profile, user } = useAuth();
-  const isApproved = isAdmin || profile?.registration_status === "active";
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchUnread = async () => {
-      const { count } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .eq("read", false);
-      setUnreadCount(count || 0);
-    };
-    fetchUnread();
-    const channel = supabase
-      .channel("notifications-tabbar")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        fetchUnread
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user, location.pathname]);
-
-  const items = [
-    { title: "Home", url: "/dashboard", icon: LayoutDashboard },
-    ...(isApproved ? [{ title: "Tasks", url: "/tasks", icon: ListChecks }] : []),
-    { title: "Wallet", url: "/wallet", icon: Wallet },
-    { title: "Alerts", url: "/notifications", icon: Bell },
-    { title: "Profile", url: "/profile", icon: UserCircle },
-  ];
+  const unread = useUnreadNotifications();
 
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-40 rounded-[var(--radius)] border-0 bg-background neu-raised safe-bottom md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur safe-bottom md:hidden">
       <ul className="flex items-stretch justify-around">
         {items.map((item) => {
-          const active = location.pathname === item.url;
-          const showBadge = item.url === "/notifications" && unreadCount > 0;
+          const active = location.pathname.startsWith(item.url);
+          const showBadge = item.url === "/notifications" && unread > 0;
           return (
             <li key={item.url} className="flex-1">
               <Link
                 to={item.url}
                 className={cn(
                   "flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium transition-colors",
-                  active ? "text-primary" : "text-muted-foreground"
+                  active ? "text-primary" : "text-muted-foreground",
                 )}
               >
-                <span
-                  className={cn(
-                    "relative flex h-8 w-12 items-center justify-center rounded-full transition-all duration-300",
-                    active ? "neu-inset text-primary" : "neu-flat"
-                  )}
-                >
-                  <item.icon className="h-[1.1rem] w-[1.1rem]" />
+                <span className="relative flex h-6 w-10 items-center justify-center">
+                  <item.icon className="h-[1.15rem] w-[1.15rem]" />
                   {showBadge && (
-                    <span className="absolute -top-1 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold leading-none text-primary-foreground">
-                      {unreadCount > 99 ? "99+" : unreadCount}
+                    <span className="absolute -top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold leading-none text-primary-foreground">
+                      {unread > 99 ? "99+" : unread}
                     </span>
                   )}
                 </span>
