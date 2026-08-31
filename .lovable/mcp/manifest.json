@@ -12,7 +12,7 @@
   "mcp": {
     "server": {
       "name": "entrevault-mcp",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "title": "EntreVault"
     },
     "tools": [
@@ -29,89 +29,6 @@
           "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "object",
           "properties": {}
-        },
-        "outputSchema": null
-      },
-      {
-        "name": "list_tasks",
-        "title": "List tasks",
-        "description": "List EntreVault earning tasks with reward amount, capacity and remaining slots. Defaults to open tasks only.",
-        "annotations": {
-          "readOnlyHint": true,
-          "idempotentHint": true,
-          "openWorldHint": false
-        },
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "include_closed": {
-              "type": "boolean",
-              "description": "Include tasks that are closed or full. Defaults to false."
-            },
-            "limit": {
-              "type": "integer",
-              "description": "Max tasks to return (default 25)."
-            }
-          },
-          "additionalProperties": false,
-          "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "outputSchema": null
-      },
-      {
-        "name": "list_my_submissions",
-        "title": "List my task submissions",
-        "description": "List the signed-in user's task submissions with review status (pending, approved, rejected).",
-        "annotations": {
-          "readOnlyHint": true,
-          "idempotentHint": true,
-          "openWorldHint": false
-        },
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string",
-              "enum": [
-                "pending",
-                "approved",
-                "rejected"
-              ],
-              "description": "Filter by review status."
-            },
-            "limit": {
-              "type": "integer",
-              "description": "Max submissions to return (default 25)."
-            }
-          },
-          "additionalProperties": false,
-          "$schema": "http://json-schema.org/draft-07/schema#"
-        },
-        "outputSchema": null
-      },
-      {
-        "name": "list_transactions",
-        "title": "List my transactions",
-        "description": "List the signed-in user's USDT wallet transactions (deposits, withdrawals, rewards, referral bonuses).",
-        "annotations": {
-          "readOnlyHint": true,
-          "idempotentHint": true,
-          "openWorldHint": false
-        },
-        "inputSchema": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "Filter by transaction type, e.g. deposit or withdrawal."
-            },
-            "limit": {
-              "type": "integer",
-              "description": "Max transactions to return (default 25)."
-            }
-          },
-          "additionalProperties": false,
-          "$schema": "http://json-schema.org/draft-07/schema#"
         },
         "outputSchema": null
       },
@@ -134,6 +51,59 @@
             "limit": {
               "type": "integer",
               "description": "Max courses to return (default 25)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_enrollments",
+        "title": "List my enrollments",
+        "description": "List the signed-in user's course enrollments and their access status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "Max enrollments to return (default 25)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_sessions",
+        "title": "List live classes",
+        "description": "List EntreVault live classes the signed-in user can access, newest upcoming first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "course_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filter by course id."
+            },
+            "include_past": {
+              "type": "boolean",
+              "description": "Include sessions that already ended."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Max sessions to return (default 25)."
             }
           },
           "additionalProperties": false,

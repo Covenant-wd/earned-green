@@ -57,104 +57,16 @@ var get_profile_default = defineTool({
   }
 });
 
-// src/lib/mcp/tools/list-tasks.ts
+// src/lib/mcp/tools/list-courses.ts
 import { defineTool as defineTool2 } from "npm:@lovable.dev/mcp-js@0.24.0";
 import { z } from "npm:zod@^3.25.76";
-var list_tasks_default = defineTool2({
-  name: "list_tasks",
-  title: "List tasks",
-  description: "List EntreVault earning tasks with reward amount, capacity and remaining slots. Defaults to open tasks only.",
-  inputSchema: {
-    include_closed: z.boolean().optional().describe("Include tasks that are closed or full. Defaults to false."),
-    limit: z.number().int().optional().describe("Max tasks to return (default 25).")
-  },
-  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
-  handler: async ({ include_closed, limit }, ctx) => {
-    if (!ctx.isAuthenticated()) return unauthenticated();
-    const supabase = supabaseForUser(ctx);
-    const take = Math.min(Math.max(limit ?? 25, 1), 100);
-    let query = supabase.from("tasks").select(
-      "id, title, description, category, platform, type, difficulty, link, reward_amount, max_completions, external_completions, is_active, status, created_at"
-    ).order("created_at", { ascending: false }).limit(take);
-    if (!include_closed) query = query.eq("is_active", true);
-    const { data, error } = await query;
-    if (error) return failure(error.message);
-    const ids = (data ?? []).map((t) => t.id);
-    const counts = /* @__PURE__ */ new Map();
-    if (ids.length) {
-      const { data: completions } = await supabase.from("task_completions").select("task_id").in("task_id", ids).neq("status", "rejected");
-      for (const row of completions ?? []) {
-        counts.set(row.task_id, (counts.get(row.task_id) ?? 0) + 1);
-      }
-    }
-    const tasks = (data ?? []).map((t) => {
-      const submitted = (counts.get(t.id) ?? 0) + (t.external_completions ?? 0);
-      const slotsLeft = t.max_completions == null ? null : Math.max(t.max_completions - submitted, 0);
-      return { ...t, submitted_count: submitted, slots_left: slotsLeft, is_full: slotsLeft === 0 };
-    });
-    const visible = include_closed ? tasks : tasks.filter((t) => !t.is_full);
-    return ok(visible, { tasks: visible });
-  }
-});
-
-// src/lib/mcp/tools/list-my-submissions.ts
-import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.24.0";
-import { z as z2 } from "npm:zod@^3.25.76";
-var list_my_submissions_default = defineTool3({
-  name: "list_my_submissions",
-  title: "List my task submissions",
-  description: "List the signed-in user's task submissions with review status (pending, approved, rejected).",
-  inputSchema: {
-    status: z2.enum(["pending", "approved", "rejected"]).optional().describe("Filter by review status."),
-    limit: z2.number().int().optional().describe("Max submissions to return (default 25).")
-  },
-  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
-  handler: async ({ status, limit }, ctx) => {
-    if (!ctx.isAuthenticated()) return unauthenticated();
-    const take = Math.min(Math.max(limit ?? 25, 1), 100);
-    let query = supabaseForUser(ctx).from("task_completions").select(
-      "id, status, submitted_at, reviewed_at, proof_url, task_id, tasks(title, reward_amount, category)"
-    ).eq("user_id", ctx.getUserId()).order("submitted_at", { ascending: false }).limit(take);
-    if (status) query = query.eq("status", status);
-    const { data, error } = await query;
-    if (error) return failure(error.message);
-    return ok(data ?? [], { submissions: data ?? [] });
-  }
-});
-
-// src/lib/mcp/tools/list-transactions.ts
-import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.24.0";
-import { z as z3 } from "npm:zod@^3.25.76";
-var list_transactions_default = defineTool4({
-  name: "list_transactions",
-  title: "List my transactions",
-  description: "List the signed-in user's USDT wallet transactions (deposits, withdrawals, rewards, referral bonuses).",
-  inputSchema: {
-    type: z3.string().optional().describe("Filter by transaction type, e.g. deposit or withdrawal."),
-    limit: z3.number().int().optional().describe("Max transactions to return (default 25).")
-  },
-  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
-  handler: async ({ type, limit }, ctx) => {
-    if (!ctx.isAuthenticated()) return unauthenticated();
-    const take = Math.min(Math.max(limit ?? 25, 1), 100);
-    let query = supabaseForUser(ctx).from("transactions").select("id, type, amount, status, tx_hash, wallet_address, created_at").eq("user_id", ctx.getUserId()).order("created_at", { ascending: false }).limit(take);
-    if (type) query = query.eq("type", type);
-    const { data, error } = await query;
-    if (error) return failure(error.message);
-    return ok(data ?? [], { transactions: data ?? [] });
-  }
-});
-
-// src/lib/mcp/tools/list-courses.ts
-import { defineTool as defineTool5 } from "npm:@lovable.dev/mcp-js@0.24.0";
-import { z as z4 } from "npm:zod@^3.25.76";
-var list_courses_default = defineTool5({
+var list_courses_default = defineTool2({
   name: "list_courses",
   title: "List courses",
   description: "List EntreVault content creation and marketing courses available to the signed-in user.",
   inputSchema: {
-    category: z4.string().optional().describe("Filter by course category."),
-    limit: z4.number().int().optional().describe("Max courses to return (default 25).")
+    category: z.string().optional().describe("Filter by course category."),
+    limit: z.number().int().optional().describe("Max courses to return (default 25).")
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ category, limit }, ctx) => {
@@ -169,15 +81,15 @@ var list_courses_default = defineTool5({
 });
 
 // src/lib/mcp/tools/list-notifications.ts
-import { defineTool as defineTool6 } from "npm:@lovable.dev/mcp-js@0.24.0";
-import { z as z5 } from "npm:zod@^3.25.76";
-var list_notifications_default = defineTool6({
+import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.24.0";
+import { z as z2 } from "npm:zod@^3.25.76";
+var list_notifications_default = defineTool3({
   name: "list_notifications",
   title: "List my notifications",
   description: "List the signed-in user's in-app EntreVault notifications, newest first.",
   inputSchema: {
-    unread_only: z5.boolean().optional().describe("Only return unread notifications."),
-    limit: z5.number().int().optional().describe("Max notifications to return (default 20).")
+    unread_only: z2.boolean().optional().describe("Only return unread notifications."),
+    limit: z2.number().int().optional().describe("Max notifications to return (default 20).")
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ unread_only, limit }, ctx) => {
@@ -191,23 +103,67 @@ var list_notifications_default = defineTool6({
   }
 });
 
+// src/lib/mcp/tools/list-sessions.ts
+import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.24.0";
+import { z as z3 } from "npm:zod@^3.25.76";
+var list_sessions_default = defineTool4({
+  name: "list_sessions",
+  title: "List live classes",
+  description: "List EntreVault live classes the signed-in user can access, newest upcoming first.",
+  inputSchema: {
+    course_id: z3.string().uuid().optional().describe("Filter by course id."),
+    include_past: z3.boolean().optional().describe("Include sessions that already ended."),
+    limit: z3.number().int().optional().describe("Max sessions to return (default 25).")
+  },
+  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  handler: async ({ course_id, include_past, limit }, ctx) => {
+    if (!ctx.isAuthenticated()) return unauthenticated();
+    const take = Math.min(Math.max(limit ?? 25, 1), 100);
+    let query = supabaseForUser(ctx).from("live_sessions").select("id, title, description, course_id, starts_at, duration_minutes, status, timezone").order("starts_at", { ascending: true }).limit(take);
+    if (course_id) query = query.eq("course_id", course_id);
+    if (!include_past) query = query.gte("starts_at", new Date(Date.now() - 3 * 36e5).toISOString());
+    const { data, error } = await query;
+    if (error) return failure(error.message);
+    return ok(data ?? [], { sessions: data ?? [] });
+  }
+});
+
+// src/lib/mcp/tools/list-my-enrollments.ts
+import { defineTool as defineTool5 } from "npm:@lovable.dev/mcp-js@0.24.0";
+import { z as z4 } from "npm:zod@^3.25.76";
+var list_my_enrollments_default = defineTool5({
+  name: "list_my_enrollments",
+  title: "List my enrollments",
+  description: "List the signed-in user's course enrollments and their access status.",
+  inputSchema: {
+    limit: z4.number().int().optional().describe("Max enrollments to return (default 25).")
+  },
+  annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+  handler: async ({ limit }, ctx) => {
+    if (!ctx.isAuthenticated()) return unauthenticated();
+    const take = Math.min(Math.max(limit ?? 25, 1), 100);
+    const { data, error } = await supabaseForUser(ctx).from("enrollments").select("id, course_id, status, enrolled_at, access_expires_at, courses(title, slug, level)").eq("user_id", ctx.getUserId()).order("enrolled_at", { ascending: false }).limit(take);
+    if (error) return failure(error.message);
+    return ok(data ?? [], { enrollments: data ?? [] });
+  }
+});
+
 // src/lib/mcp/index.ts
 var projectRef = "ljhpnkleqfgudfqkebog";
 var mcp_default = defineMcp({
   name: "entrevault-mcp",
   title: "EntreVault",
-  version: "0.1.0",
-  instructions: "Tools for EntreVault, a content creation & marketing learning platform where users earn USDT by completing tasks. Callers act as the signed-in user: read their profile and wallet balance, browse open tasks and remaining slots, review their own task submissions and transactions, list courses, and read notifications.",
+  version: "0.2.0",
+  instructions: "Tools for EntreVault, a live learning platform teaching practical technology skills. Callers act as the signed-in user: read their profile, browse published courses, see their enrollments, upcoming live classes and notifications.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated"
   }),
   tools: [
     get_profile_default,
-    list_tasks_default,
-    list_my_submissions_default,
-    list_transactions_default,
     list_courses_default,
+    list_my_enrollments_default,
+    list_sessions_default,
     list_notifications_default
   ]
 });
