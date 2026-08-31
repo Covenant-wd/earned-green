@@ -7,108 +7,133 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 
+import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import OAuthConsentPage from "@/pages/OAuthConsentPage";
+import NotFound from "@/pages/NotFound";
+
 import DashboardPage from "@/pages/DashboardPage";
-import TasksPage from "@/pages/TasksPage";
-import TaskDetailPage from "@/pages/TaskDetailPage";
 import CoursesPage from "@/pages/CoursesPage";
 import CourseDetailPage from "@/pages/CourseDetailPage";
-import GuidesPage from "@/pages/GuidesPage";
-import WalletPage from "@/pages/WalletPage";
+import LessonPage from "@/pages/LessonPage";
+import SchedulePage from "@/pages/SchedulePage";
+import ClassroomPage from "@/pages/ClassroomPage";
+import AssignmentsPage from "@/pages/AssignmentsPage";
+import BillingPage from "@/pages/BillingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import NotificationsPage from "@/pages/NotificationsPage";
+
+import TeacherDashboard from "@/pages/teacher/TeacherDashboard";
+import TeacherCourseDetail from "@/pages/teacher/TeacherCourseDetail";
+import TeacherGradingPage from "@/pages/teacher/TeacherGradingPage";
+
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
-import AdminTasksPage from "@/pages/admin/AdminTasksPage";
 import AdminCoursesPage from "@/pages/admin/AdminCoursesPage";
-import AdminLessonsPage from "@/pages/admin/AdminLessonsPage";
-import AdminGuidesPage from "@/pages/admin/AdminGuidesPage";
-import AdminVerificationsPage from "@/pages/admin/AdminVerificationsPage";
-import AdminTransactionsPage from "@/pages/admin/AdminTransactionsPage";
+import AdminCourseEditorPage from "@/pages/admin/AdminCourseEditorPage";
+import AdminSessionsPage from "@/pages/admin/AdminSessionsPage";
+import AdminAnnouncementsPage from "@/pages/admin/AdminAnnouncementsPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
-import AdminBroadcastPage from "@/pages/admin/AdminBroadcastPage";
-import NotFound from "@/pages/NotFound";
-import HomePage from "@/pages/HomePage";
-import OAuthConsentPage from "@/pages/OAuthConsentPage";
-
 
 const queryClient = new QueryClient();
 
+function LoadingScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="h-8 w-8 animate-pulse rounded-full bg-primary" />
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
+  if (loading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <AppLayout>{children}</AppLayout>;
 }
 
-function ApprovedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAdmin, loading, profile } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
+function TeacherRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isTeacher, isAdmin, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!isAdmin && profile?.registration_status !== "active") return <Navigate to="/dashboard" replace />;
+  if (!isTeacher && !isAdmin) return <Navigate to="/dashboard" replace />;
   return <AppLayout>{children}</AppLayout>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAdmin, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
+  if (loading) return <LoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
   return <AppLayout>{children}</AppLayout>;
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse-glow h-8 w-8 rounded-full gradient-primary" /></div>;
+  if (loading) return <LoadingScreen />;
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
-const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<PublicRoute><HomePage /></PublicRoute>} />
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-            <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/.lovable/oauth/consent" element={<OAuthConsentPage />} />
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Public */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+      <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/oauth/consent" element={<OAuthConsentPage />} />
 
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-            <Route path="/tasks" element={<ApprovedRoute><TasksPage /></ApprovedRoute>} />
-            <Route path="/tasks/:id" element={<ApprovedRoute><TaskDetailPage /></ApprovedRoute>} />
-            <Route path="/courses" element={<ApprovedRoute><CoursesPage /></ApprovedRoute>} />
-            <Route path="/courses/:id" element={<ApprovedRoute><CourseDetailPage /></ApprovedRoute>} />
-            <Route path="/guides" element={<ApprovedRoute><GuidesPage /></ApprovedRoute>} />
-            <Route path="/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
-            <Route path="/admin/tasks" element={<AdminRoute><AdminTasksPage /></AdminRoute>} />
-            <Route path="/admin/courses" element={<AdminRoute><AdminCoursesPage /></AdminRoute>} />
-            <Route path="/admin/courses/:courseId/lessons" element={<AdminRoute><AdminLessonsPage /></AdminRoute>} />
-            <Route path="/admin/guides" element={<AdminRoute><AdminGuidesPage /></AdminRoute>} />
-            <Route path="/admin/verifications" element={<AdminRoute><AdminVerificationsPage /></AdminRoute>} />
-            <Route path="/admin/transactions" element={<AdminRoute><AdminTransactionsPage /></AdminRoute>} />
-            <Route path="/admin/broadcast" element={<AdminRoute><AdminBroadcastPage /></AdminRoute>} />
-            <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-  </ThemeProvider>
-);
+      {/* Student */}
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/courses" element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
+      <Route path="/courses/:slug" element={<ProtectedRoute><CourseDetailPage /></ProtectedRoute>} />
+      <Route path="/courses/:slug/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+      <Route path="/schedule" element={<ProtectedRoute><SchedulePage /></ProtectedRoute>} />
+      <Route path="/classroom/:sessionId" element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
+      <Route path="/assignments" element={<ProtectedRoute><AssignmentsPage /></ProtectedRoute>} />
+      <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
-export default App;
+      {/* Teacher */}
+      <Route path="/teach" element={<TeacherRoute><TeacherDashboard /></TeacherRoute>} />
+      <Route path="/teach/courses/:id" element={<TeacherRoute><TeacherCourseDetail /></TeacherRoute>} />
+      <Route path="/teach/assignments/:assignmentId/submissions" element={<TeacherRoute><TeacherGradingPage /></TeacherRoute>} />
+
+      {/* Admin */}
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+      <Route path="/admin/courses" element={<AdminRoute><AdminCoursesPage /></AdminRoute>} />
+      <Route path="/admin/courses/:id" element={<AdminRoute><AdminCourseEditorPage /></AdminRoute>} />
+      <Route path="/admin/sessions" element={<AdminRoute><AdminSessionsPage /></AdminRoute>} />
+      <Route path="/admin/announcements" element={<AdminRoute><AdminAnnouncementsPage /></AdminRoute>} />
+      <Route path="/admin/settings" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <AppRoutes />
+            </AuthProvider>
+          </BrowserRouter>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
